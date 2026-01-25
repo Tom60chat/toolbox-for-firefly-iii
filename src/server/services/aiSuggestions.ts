@@ -136,9 +136,7 @@ export class AISuggestionService {
             reasoning: suggestion.reasoning,
             unableToClassify: true,
           };
-          logger.debug(
-            `Unable to classify: "${split.description.substring(0, 30)}..."`
-          );
+          logger.debug(`Unable to classify: "${split.description.substring(0, 30)}..."`);
           yield { type: 'suggestion', data: categorySuggestion };
         } else if (category) {
           const categorySuggestion: CategorySuggestion = {

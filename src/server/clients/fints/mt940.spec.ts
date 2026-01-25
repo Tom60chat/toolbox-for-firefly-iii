@@ -23,10 +23,7 @@ describe('extractStructuredData', () => {
   });
 
   it('should handle multi-line continuation within structured fields', () => {
-    const lines = [
-      'SVWZ+Monthly subscription Invo',
-      'ice Order-99 CustomerID:',
-    ];
+    const lines = ['SVWZ+Monthly subscription Invo', 'ice Order-99 CustomerID:'];
 
     const result = extractStructuredData(lines);
 

@@ -127,12 +127,7 @@
                     selection.toggle(suggestion.transactionId, $event ?? undefined)
                   "
                 />
-                <v-icon
-                  v-else
-                  color="warning"
-                  class="mr-4 mt-1"
-                  size="24"
-                >
+                <v-icon v-else color="warning" class="mr-4 mt-1" size="24">
                   mdi-help-circle
                 </v-icon>
 
