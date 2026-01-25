@@ -109,9 +109,10 @@ jobs:
         uses: orhun/git-cliff-action@v4
         with:
           config: cliff.toml
-          args: ${{ steps.prev_tag.outputs.tag && format('{0}..{1}', steps.prev_tag.outputs.tag, github.ref_name) || github.ref_name }}
+          args: ${{ steps.prev_tag.outputs.tag && format('{0}..{1}', steps.prev_tag.outputs.tag, github.ref_name) || '--latest' }}
         env:
           OUTPUT: CHANGELOG.md
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
