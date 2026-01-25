@@ -158,10 +158,18 @@ function detectAuthMethod(enabledMethods: AuthMethod[]): AuthMethod {
   if (enabledMethods.length > 0) {
     // Return the first enabled method that is also configured
     for (const method of enabledMethods) {
-      if (method === 'basic' && getOptionalEnvVar('AUTH_BASIC_USERNAME') && getOptionalEnvVar('AUTH_BASIC_PASSWORD')) {
+      if (
+        method === 'basic' &&
+        getOptionalEnvVar('AUTH_BASIC_USERNAME') &&
+        getOptionalEnvVar('AUTH_BASIC_PASSWORD')
+      ) {
         return 'basic';
       }
-      if (method === 'oidc' && getOptionalEnvVar('AUTH_OIDC_ISSUER_URL') && getOptionalEnvVar('AUTH_OIDC_CLIENT_ID')) {
+      if (
+        method === 'oidc' &&
+        getOptionalEnvVar('AUTH_OIDC_ISSUER_URL') &&
+        getOptionalEnvVar('AUTH_OIDC_CLIENT_ID')
+      ) {
         return 'oidc';
       }
       if (method === 'firefly' && getOptionalEnvVar('AUTH_FIREFLY_CLIENT_ID')) {
@@ -411,7 +419,9 @@ export function validateConfig(): { valid: boolean; errors: string[]; warnings: 
   const enabledMethods = config.auth.enabledMethods;
 
   if (enabledMethods.includes('basic') && !isBasicAuthConfigured()) {
-    errors.push('AUTH_BASIC_USERNAME and AUTH_BASIC_PASSWORD are required when basic auth is enabled in AUTH_METHODS');
+    errors.push(
+      'AUTH_BASIC_USERNAME and AUTH_BASIC_PASSWORD are required when basic auth is enabled in AUTH_METHODS'
+    );
   }
 
   if (enabledMethods.includes('oidc') && !isOIDCConfigured()) {
