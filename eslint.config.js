@@ -6,7 +6,7 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 export default [
   // Global ignores
   {
-    ignores: ['dist/**', 'node_modules/**'],
+    ignores: ['dist/**', 'node_modules/**', 'coverage/**'],
   },
 
   // Base JavaScript recommended rules
@@ -59,6 +59,14 @@ export default [
     },
     rules: {
       'vue/multi-word-component-names': 'off',
+    },
+  },
+
+  // Test files - allow 'any' for mocking
+  {
+    files: ['**/*.spec.ts', '**/*.test.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 ];
