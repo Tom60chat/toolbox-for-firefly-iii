@@ -22,7 +22,7 @@
           :count="preview.count.value ?? 0"
           :loading="preview.fetching.value"
           :loading-more="preview.loadingMore.value"
-          loading-text="Fetching transactions..."
+          :loading-text="t('common.status.fetchingTransactions')"
           @change="debouncedFetchCount"
           @load-more="loadMoreTransactions"
         />
@@ -43,16 +43,16 @@
         <EmptyState
           v-if="!loading && !hasSearched"
           icon="mdi-magnify"
-          title="Ready to analyze"
-          subtitle="Click 'Find Duplicates' to scan for potential duplicate transactions"
+          :title="t('common.messages.readyToAnalyze')"
+          :subtitle="t('views.duplicates.clickToScan')"
         />
 
         <!-- Empty State - No duplicates found -->
         <EmptyState
           v-else-if="!loading && duplicateGroups.length === 0 && hasSearched"
           icon="mdi-check-circle"
-          title="No duplicates found"
-          subtitle="Your transactions look clean!"
+          :title="t('views.duplicates.noDuplicatesFound')"
+          :subtitle="t('views.duplicates.transactionsLookClean')"
         />
 
         <!-- Results -->
@@ -61,13 +61,13 @@
           <ResultsSummaryCard
             :stats="[
               {
-                label: 'duplicate groups',
+                label: t('views.duplicates.duplicateGroups'),
                 value: duplicateGroups.length,
                 color: 'warning',
                 icon: 'mdi-content-copy',
               },
               {
-                label: 'total transactions',
+                label: t('common.labels.totalTransactions'),
                 value: totalDuplicateCount,
                 color: 'grey',
                 icon: 'mdi-file-document-multiple',
@@ -75,7 +75,7 @@
             ]"
             :show-select-all="false"
             :selected-count="selection.selected.value.length"
-            action-text="Delete Selected"
+            :action-text="t('common.buttons.deleteSelected')"
             action-color="error"
             action-icon="mdi-delete"
             :action-loading="deleting"
@@ -103,13 +103,13 @@
                       <div class="text-caption text-medium-emphasis">
                         {{ formatAmount(group.transactions[0]?.attributes.transactions[0]) }}
                         <template v-if="group.confidenceBreakdown?.dateMatch">
-                          • Same date</template
+                          • {{ t('views.duplicates.sameDate') }}</template
                         >
                         <template v-if="group.confidenceBreakdown?.sourceAccountMatch">
-                          • Same source</template
+                          • {{ t('views.duplicates.sameSource') }}</template
                         >
                         <template v-if="group.confidenceBreakdown?.destinationAccountMatch">
-                          • Same destination</template
+                          • {{ t('views.duplicates.sameDestination') }}</template
                         >
                       </div>
                     </div>
@@ -131,7 +131,7 @@
                           @click.stop="dismissGroup(group.id)"
                         />
                       </template>
-                      <span>Dismiss (not a duplicate)</span>
+                      <span>{{ t('views.duplicates.dismissNotDuplicate') }}</span>
                     </v-tooltip>
                   </div>
                 </div>
@@ -158,7 +158,7 @@
                         :loading="deletingId === transaction.id"
                         @click.stop="deleteSingle(transaction.id)"
                       >
-                        Delete
+                        {{ t('common.buttons.delete') }}
                       </v-btn>
                     </div>
                   </template>
@@ -174,8 +174,8 @@
         <FinalActionButton
           v-if="currentStep === 2"
           :has-run="hasSearched"
-          text="Find Duplicates"
-          rerun-text="Re-scan"
+          :text="t('common.buttons.findDuplicates')"
+          :rerun-text="t('common.buttons.rescan')"
           icon="mdi-magnify"
           :loading="loading"
           @click="findDuplicates"
@@ -186,15 +186,14 @@
     <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="confirmDialog" max-width="400">
       <v-card>
-        <v-card-title>Confirm Deletion</v-card-title>
+        <v-card-title>{{ t('views.duplicates.confirmDeletion') }}</v-card-title>
         <v-card-text>
-          Are you sure you want to delete {{ selection.selected.value.length }} transaction(s)? This
-          action cannot be undone.
+          {{ t('views.duplicates.confirmDeleteMessage', { count: selection.selected.value.length }) }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="confirmDialog = false">Cancel</v-btn>
-          <v-btn color="error" @click="confirmDelete">Delete</v-btn>
+          <v-btn variant="text" @click="confirmDialog = false">{{ t('common.buttons.cancel') }}</v-btn>
+          <v-btn color="error" @click="confirmDelete">{{ t('common.buttons.delete') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -203,6 +202,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import api from '../services/api';
 import type { DuplicateGroup, DuplicateConfidenceBreakdown } from '@shared/types/app';
 import {
@@ -229,15 +229,18 @@ import {
 } from '../composables';
 import { formatCurrency, DuplicateGroupSchema } from '../utils';
 
+// i18n
+const { t } = useI18n();
+
 // Snackbar
 const { showSnackbar } = useSnackbar();
 
 // Wizard state
 const currentStep = ref(1);
-const wizardSteps = [
-  { title: 'Date Range', subtitle: 'Select transactions to analyze' },
-  { title: 'Find & Review', subtitle: 'Review and delete duplicates' },
-];
+const wizardSteps = computed(() => [
+  { title: t('common.steps.dateRange'), subtitle: t('common.steps.selectTransactionsToAnalyze') },
+  { title: t('common.steps.findReview'), subtitle: t('views.duplicates.steps.findReview.subtitle') },
+]);
 
 // Step 1: Date range state
 const startDate = ref<string>();
@@ -286,18 +289,18 @@ const stepLoading = computed(() => {
 const nextButtonText = computed(() => {
   switch (currentStep.value) {
     case 1:
-      return 'Find Duplicates';
+      return t('common.buttons.findDuplicates');
     default:
-      return 'Next';
+      return t('common.buttons.next');
   }
 });
 
 const statusMessage = computed(() => {
   if (currentStep.value === 1) {
-    if (preview.fetching.value) return 'Fetching...';
+    if (preview.fetching.value) return t('common.messages.fetching');
     if (preview.count.value === null) return '';
-    if (preview.count.value === 0) return 'No transactions found';
-    return `${preview.count.value} transactions`;
+    if (preview.count.value === 0) return t('common.messages.noTransactionsFound');
+    return t('common.labels.countTransactions', { count: preview.count.value });
   }
   return '';
 });
@@ -371,7 +374,10 @@ function handleStreamEvent(
         progressData.current || 0,
         progressData.total || 0,
         progressData.message ||
-          `Analyzing transaction ${progressData.current} of ${progressData.total}...`
+          t('common.messages.analyzingTransaction', {
+            current: progressData.current,
+            total: progressData.total,
+          })
       );
       break;
     }
@@ -389,7 +395,7 @@ function handleStreamEvent(
     }
     case 'error': {
       const errorData = event.data as { error: string };
-      showSnackbar(errorData?.error || 'An error occurred', 'error');
+      showSnackbar(errorData?.error || t('common.errors.anErrorOccurred'), 'error');
       break;
     }
     case 'complete':
@@ -418,14 +424,20 @@ async function findDuplicates() {
 
     if (validationErrorCount.value > 0) {
       showSnackbar(
-        `${validationErrorCount.value} item(s) skipped due to data errors. Check console for details.`,
+        t('common.messages.itemsSkipped', { count: validationErrorCount.value }),
         'warning'
       );
     } else if (duplicateGroups.value.length > 0) {
-      showSnackbar(`Found ${duplicateGroups.value.length} duplicate groups`, 'info');
+      showSnackbar(
+        t('views.duplicates.foundGroups', { count: duplicateGroups.value.length }),
+        'info'
+      );
     }
   } catch (error) {
-    showSnackbar(error instanceof Error ? error.message : 'Failed to find duplicates', 'error');
+    showSnackbar(
+      error instanceof Error ? error.message : t('views.duplicates.failedToFind'),
+      'error'
+    );
   } finally {
     loading.value = false;
   }
@@ -434,13 +446,13 @@ async function findDuplicates() {
 // Get breakdown items for the confidence breakdown component
 function getDuplicateBreakdownItems(breakdown: DuplicateConfidenceBreakdown): BreakdownItem[] {
   return [
-    { label: 'Date Match', value: breakdown.dateMatch, max: 0.2 },
-    { label: 'Amount Match', value: breakdown.amountMatch, max: 0.25 },
-    { label: 'Description Match', value: breakdown.descriptionMatch, max: 0.2 },
-    { label: 'Source Account', value: breakdown.sourceAccountMatch, max: 0.15 },
-    { label: 'Destination Account', value: breakdown.destinationAccountMatch, max: 0.15 },
-    { label: 'External ID', value: breakdown.externalIdMatch, max: 0.05, muted: true },
-    { label: 'Import Hash', value: breakdown.importHashMatch, max: 0.05, muted: true },
+    { label: t('views.duplicates.breakdown.dateMatch'), value: breakdown.dateMatch, max: 0.2 },
+    { label: t('common.labels.amountMatch'), value: breakdown.amountMatch, max: 0.25 },
+    { label: t('common.labels.descriptionMatch'), value: breakdown.descriptionMatch, max: 0.2 },
+    { label: t('views.duplicates.breakdown.sourceAccount'), value: breakdown.sourceAccountMatch, max: 0.15 },
+    { label: t('views.duplicates.breakdown.destinationAccount'), value: breakdown.destinationAccountMatch, max: 0.15 },
+    { label: t('views.duplicates.breakdown.externalId'), value: breakdown.externalIdMatch, max: 0.05, muted: true },
+    { label: t('views.duplicates.breakdown.importHash'), value: breakdown.importHashMatch, max: 0.05, muted: true },
   ];
 }
 
@@ -484,10 +496,16 @@ async function confirmDelete() {
 
     duplicateGroups.value = duplicateGroups.value.filter((g) => g.transactions.length > 1);
 
-    showSnackbar(`Deleted ${selection.selected.value.length} transactions`, 'success');
+    showSnackbar(
+      t('views.duplicates.deletedTransactions', { count: selection.selected.value.length }),
+      'success'
+    );
     selection.clear();
   } catch (error) {
-    showSnackbar(error instanceof Error ? error.message : 'Failed to delete transactions', 'error');
+    showSnackbar(
+      error instanceof Error ? error.message : t('views.duplicates.failedToDelete'),
+      'error'
+    );
   } finally {
     deleting.value = false;
   }
@@ -510,9 +528,12 @@ async function deleteSingle(id: string) {
       selection.toggle(id, false);
     }
 
-    showSnackbar('Transaction deleted', 'success');
+    showSnackbar(t('views.duplicates.transactionDeleted'), 'success');
   } catch (error) {
-    showSnackbar(error instanceof Error ? error.message : 'Failed to delete transaction', 'error');
+    showSnackbar(
+      error instanceof Error ? error.message : t('views.duplicates.failedToDeleteTransaction'),
+      'error'
+    );
   } finally {
     deletingId.value = null;
   }

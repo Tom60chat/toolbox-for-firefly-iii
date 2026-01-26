@@ -2,11 +2,12 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import pluginVue from 'eslint-plugin-vue';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import vueI18n from '@intlify/eslint-plugin-vue-i18n';
 
 export default [
   // Global ignores
   {
-    ignores: ['dist/**', 'node_modules/**', 'coverage/**'],
+    ignores: ['dist/**', 'node_modules/**', 'coverage/**', '**/*.json', '**/*.yml', '**/*.yaml', '**/*.md'],
   },
 
   // Base JavaScript recommended rules
@@ -17,6 +18,9 @@ export default [
 
   // Vue recommended rules
   ...pluginVue.configs['flat/recommended'],
+
+  // Vue I18n plugin rules
+  ...vueI18n.configs['flat/recommended'],
 
   // Prettier compatibility (disables conflicting rules)
   eslintConfigPrettier,
@@ -74,6 +78,23 @@ export default [
     },
     rules: {
       'vue/multi-word-component-names': 'off',
+    },
+  },
+
+  // Vue I18n specific settings
+  {
+    files: ['**/*.vue', '**/*.ts', '**/*.js'],
+    settings: {
+      'vue-i18n': {
+        localeDir: './src/client/locales/*.json',
+        messageSyntaxVersion: '^9.0.0',
+      },
+    },
+    rules: {
+      '@intlify/vue-i18n/no-unused-keys': 'warn',
+      '@intlify/vue-i18n/no-missing-keys': 'error',
+      '@intlify/vue-i18n/no-raw-text': 'off', // Can be enabled if you want to enforce i18n for all text
+      '@intlify/vue-i18n/key-format-style': ['warn', 'camelCase'],
     },
   },
 

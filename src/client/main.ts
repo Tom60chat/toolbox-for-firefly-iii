@@ -4,6 +4,7 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import App from './App.vue';
 import router from './router';
 import vuetifyDefault, { createVuetifyInstance } from './plugins/vuetify';
+import i18n from './plugins/i18n';
 import { initializeApi } from './services/api';
 import { useAuthStore } from './stores';
 
@@ -30,6 +31,9 @@ async function bootstrap() {
   });
 
   app.use(router);
+
+  // Initialize i18n
+  app.use(i18n);
 
   // In development, load all Vuetify components to avoid constant HMR reloads
   // In production, use tree-shaken version via vite-plugin-vuetify

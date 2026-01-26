@@ -3,7 +3,7 @@
     <div class="d-flex align-center justify-space-between mb-2">
       <div class="text-subtitle-2">{{ label }}</div>
       <v-chip size="x-small" :color="blocks.length > 0 ? 'primary' : 'default'">
-        {{ blocks.length }} block{{ blocks.length !== 1 ? 's' : '' }}
+        {{ t('components.converter.blocksCount', { count: blocks.length }) }}
       </v-chip>
     </div>
 
@@ -44,7 +44,7 @@
       <!-- Empty State -->
       <div v-if="blocks.length === 0" class="text-center text-medium-emphasis py-3">
         <v-icon size="small" class="mb-1">mdi-information-outline</v-icon>
-        <div class="text-caption">{{ emptyText }}</div>
+        <div class="text-caption">{{ resolvedEmptyText }}</div>
       </div>
 
       <!-- Add Block Button -->
@@ -63,12 +63,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import draggable from 'vuedraggable';
 import type { TransformBlock, TransformBlockType, BlockTypeInfo } from '@shared/types/converter';
 import { BLOCK_TYPES } from '@shared/types/converter';
 import BlockTypeSelector from './BlockTypeSelector.vue';
 import BlockEditorDialog from './BlockEditorDialog.vue';
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -82,8 +85,12 @@ const props = withDefaults(
     emptyText?: string;
   }>(),
   {
-    emptyText: 'No blocks defined. Value will remain unchanged.',
+    emptyText: undefined,
   }
+);
+
+const resolvedEmptyText = computed(
+  () => props.emptyText ?? t('components.converter.noBlocksDefined')
 );
 
 const emit = defineEmits<{
@@ -103,27 +110,27 @@ function getBlockInfo(block: TransformBlock): BlockTypeInfo {
 function getBlockPreview(block: TransformBlock): string {
   switch (block.type) {
     case 'column':
-      return block.sourceColumn || '(select)';
+      return block.sourceColumn || t('components.converter.selectColumn');
     case 'static':
-      return block.value ? `"${block.value}"` : '(empty)';
+      return block.value ? `"${block.value}"` : t('components.converter.empty');
     case 'truncate':
-      return `${block.maxLength} chars`;
+      return t('components.converter.maxChars', { max: block.maxLength });
     case 'dateFormat':
       return `${block.inputFormat} → ${block.outputFormat}`;
     case 'numberFormat':
-      return `${block.inputDecimalSeparator} → ${block.decimals} dec`;
+      return `${block.inputDecimalSeparator} → ${t('components.converter.decimalsShort', { decimals: block.decimals })}`;
     case 'conditional':
-      return `${block.thenBlocks.length} then, ${block.elseBlocks.length} else`;
+      return t('components.converter.conditionalPreview', { then: block.thenBlocks.length, else: block.elseBlocks.length });
     case 'switchCase':
-      return `${block.cases.length} cases`;
+      return t('components.converter.switchCasePreview', { cases: block.cases.length });
     case 'removeRow':
-      return block.condition.column || '(configure)';
+      return block.condition.column || t('components.converter.configure');
     case 'prefix':
-      return block.prefix || '(empty)';
+      return block.prefix || t('components.converter.empty');
     case 'suffix':
-      return block.suffix || '(empty)';
+      return block.suffix || t('components.converter.empty');
     case 'replace':
-      return block.find || '(configure)';
+      return block.find || t('components.converter.configure');
     case 'customScript':
       return 'JS';
     default:

@@ -38,7 +38,10 @@
     "typecheck": "vue-tsc --noEmit && tsc --noEmit -p tsconfig.server.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "i18n:check": "tsx scripts/check-i18n-keys.ts",
+    "i18n:check:json": "tsx scripts/check-i18n-keys.ts --json",
+    "i18n:fix": "tsx scripts/check-i18n-keys.ts --fix"
   },
   "dependencies": {
     "axios": "^1.13.3",
@@ -56,11 +59,13 @@
     "openid-client": "^6.8.1",
     "pinia-plugin-persistedstate": "^4.7.1",
     "uuid": "^13.0.0",
+    "vue-i18n": "^11.2.8",
     "vuedraggable": "^4.1.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@intlify/eslint-plugin-vue-i18n": "^4.1.1",
     "@mdi/font": "^7.4.47",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",

@@ -1,27 +1,32 @@
 <template>
   <v-btn
-    v-if="!hasRun"
+    v-if="!props.hasRun"
     color="primary"
-    :prepend-icon="icon"
-    :loading="loading"
+    :prepend-icon="props.icon"
+    :loading="props.loading"
     @click="$emit('click')"
   >
-    {{ text }}
+    {{ resolvedText }}
   </v-btn>
   <v-btn
     v-else
     color="primary"
     variant="outlined"
-    :prepend-icon="rerunIcon"
-    :loading="loading"
+    :prepend-icon="props.rerunIcon"
+    :loading="props.loading"
     @click="$emit('click')"
   >
-    {{ rerunText }}
+    {{ resolvedRerunText }}
   </v-btn>
 </template>
 
 <script setup lang="ts">
-withDefaults(
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
+const props = withDefaults(
   defineProps<{
     /** Whether the action has been run at least once */
     hasRun?: boolean;
@@ -38,13 +43,16 @@ withDefaults(
   }>(),
   {
     hasRun: false,
-    text: 'Run',
-    rerunText: 'Re-run',
+    text: undefined,
+    rerunText: undefined,
     icon: 'mdi-play',
     rerunIcon: 'mdi-refresh',
     loading: false,
   }
 );
+
+const resolvedText = computed(() => props.text ?? t('common.buttons.run'));
+const resolvedRerunText = computed(() => props.rerunText ?? t('common.buttons.rerun'));
 
 defineEmits<{
   click: [];

@@ -3,13 +3,17 @@
     <v-icon :size="64" class="mb-4 empty-state-icon">
       {{ icon }}
     </v-icon>
-    <h3 class="text-h6 empty-state-title mb-2">{{ title }}</h3>
+    <h3 class="text-h6 empty-state-title mb-2">{{ title || t('components.emptyState.noDataFound') }}</h3>
     <p v-if="subtitle" class="text-body-2 text-medium-emphasis">{{ subtitle }}</p>
     <slot />
   </div>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
 interface Props {
   icon?: string;
   title?: string;
@@ -18,7 +22,7 @@ interface Props {
 
 withDefaults(defineProps<Props>(), {
   icon: 'mdi-inbox-outline',
-  title: 'No data found',
+  title: undefined,
   subtitle: '',
 });
 </script>

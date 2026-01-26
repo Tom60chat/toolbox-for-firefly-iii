@@ -2,10 +2,10 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { TOOL_UI_CONFIG } from '../composables/useTools';
 import { useAuthStore } from '../stores/auth';
 
-/** Helper to get tool meta by route path */
+/** Helper to get tool meta by route path (uses i18n keys for deferred translation) */
 function getToolMeta(route: string) {
   const tool = Object.values(TOOL_UI_CONFIG).find((t) => t.route === route);
-  return tool ? { title: tool.title, description: tool.description } : {};
+  return tool ? { titleKey: tool.titleKey, descriptionKey: tool.descriptionKey } : {};
 }
 
 const routes: RouteRecordRaw[] = [

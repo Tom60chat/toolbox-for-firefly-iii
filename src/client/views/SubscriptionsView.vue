@@ -21,7 +21,7 @@
           :transactions="preview.transactions.value"
           :count="preview.count.value ?? 0"
           :loading="preview.fetching.value || preview.loadingMore.value"
-          loading-text="Fetching transactions..."
+          :loading-text="t('common.status.fetchingTransactions')"
           :presets="['month', 'quarter', 'year']"
           @change="debouncedFetchCount"
           @load-more="loadMoreTransactions"
@@ -34,7 +34,7 @@
               density="compact"
               icon="mdi-lightbulb"
             >
-              Tip: Use a longer date range (6+ months) for better pattern detection
+              {{ t('views.subscriptions.tip') }}
             </v-alert>
           </template>
         </DateRangeStep>
@@ -55,16 +55,16 @@
         <EmptyState
           v-if="!loading && !hasSearched"
           icon="mdi-credit-card-clock"
-          title="Ready to analyze"
-          subtitle="Click 'Find Subscriptions' to detect subscription patterns"
+          :title="t('common.messages.readyToAnalyze')"
+          :subtitle="t('views.subscriptions.clickToDetect')"
         />
 
         <!-- Empty State - No patterns found -->
         <EmptyState
           v-else-if="!loading && patterns.length === 0 && hasSearched"
           icon="mdi-calendar-blank"
-          title="No subscription patterns found"
-          subtitle="Try extending the date range for better pattern detection"
+          :title="t('views.subscriptions.noPatternsFound')"
+          :subtitle="t('views.subscriptions.tryExtendingRange')"
         />
 
         <!-- Results -->
@@ -73,13 +73,13 @@
           <ResultsSummaryCard
             :stats="[
               {
-                label: 'subscription patterns',
+                label: t('views.subscriptions.subscriptionPatterns'),
                 value: patterns.length,
                 color: 'primary',
                 icon: 'mdi-credit-card-clock',
               },
               {
-                label: 'total transactions',
+                label: t('common.labels.totalTransactions'),
                 value: totalTransactionCount,
                 color: 'grey',
                 icon: 'mdi-file-document-multiple',
@@ -104,7 +104,7 @@
                       <div class="text-caption text-medium-emphasis">
                         {{ formatCurrency(pattern.averageAmount) }}
                         • {{ formatPatternType(pattern.pattern) }} •
-                        {{ pattern.transactions.length }} occurrences
+                        {{ t('views.subscriptions.occurrences', { count: pattern.transactions.length }) }}
                       </div>
                     </div>
                   </div>
@@ -125,7 +125,7 @@
                           @click.stop="dismissPattern(pattern.id)"
                         />
                       </template>
-                      <span>Dismiss (not a subscription)</span>
+                      <span>{{ t('views.subscriptions.dismissNotSubscription') }}</span>
                     </v-tooltip>
                   </div>
                 </div>
@@ -156,7 +156,7 @@
                     prepend-icon="mdi-plus"
                     @click="openCreateDialog(pattern)"
                   >
-                    Create Subscription
+                    {{ t('common.buttons.createSubscription') }}
                   </v-btn>
                 </div>
 
@@ -179,8 +179,8 @@
         <FinalActionButton
           v-if="currentStep === 2"
           :has-run="hasSearched"
-          text="Find Subscriptions"
-          rerun-text="Re-scan"
+          :text="t('common.buttons.findSubscriptions')"
+          :rerun-text="t('common.buttons.rescan')"
           icon="mdi-credit-card-clock"
           rerun-icon="mdi-refresh"
           :loading="loading"
@@ -192,13 +192,13 @@
     <!-- Create Subscription Dialog -->
     <v-dialog v-model="createDialog" max-width="600">
       <v-card v-if="selectedPattern">
-        <v-card-title>Create Subscription</v-card-title>
+        <v-card-title>{{ t('common.buttons.createSubscription') }}</v-card-title>
         <v-card-text>
           <v-form ref="createForm">
             <v-text-field
               v-model="createData.name"
-              label="Name"
-              :rules="[(v) => !!v || 'Name is required']"
+              :label="t('common.labels.name')"
+              :rules="[(v) => !!v || t('views.subscriptions.createSubscriptionDialog.nameRequired')]"
               class="mb-4"
             />
 
@@ -206,17 +206,17 @@
               <v-col cols="6">
                 <v-text-field
                   v-model="createData.amountMin"
-                  label="Minimum Amount"
+                  :label="t('common.labels.minimumAmount')"
                   type="number"
-                  :rules="[(v) => !!v || 'Minimum amount is required']"
+                  :rules="[(v) => !!v || t('views.subscriptions.createSubscriptionDialog.minimumAmountRequired')]"
                 />
               </v-col>
               <v-col cols="6">
                 <v-text-field
                   v-model="createData.amountMax"
-                  label="Maximum Amount"
+                  :label="t('common.labels.maximumAmount')"
                   type="number"
-                  :rules="[(v) => !!v || 'Maximum amount is required']"
+                  :rules="[(v) => !!v || t('views.subscriptions.createSubscriptionDialog.maximumAmountRequired')]"
                 />
               </v-col>
             </v-row>
@@ -225,7 +225,7 @@
               <v-col cols="6">
                 <v-select
                   v-model="createData.repeatFreq"
-                  label="Frequency"
+                  :label="t('common.labels.frequency')"
                   :items="frequencyOptions"
                   item-title="text"
                   item-value="value"
@@ -234,10 +234,10 @@
               <v-col cols="6">
                 <v-text-field
                   v-model="createData.skip"
-                  label="Skip Periods"
+                  :label="t('common.labels.skipPeriods')"
                   type="number"
                   min="0"
-                  hint="0 = every period, 1 = every other, etc."
+                  :hint="t('views.subscriptions.createSubscriptionDialog.skipPeriodsHint')"
                   persistent-hint
                 />
               </v-col>
@@ -245,19 +245,19 @@
 
             <v-text-field
               v-model="createData.date"
-              label="Expected Date (next occurrence)"
+              :label="t('views.subscriptions.createSubscriptionDialog.expectedDateHint')"
               type="date"
-              :rules="[(v) => !!v || 'Date is required']"
+              :rules="[(v) => !!v || t('views.subscriptions.createSubscriptionDialog.dateRequired')]"
               class="mt-4"
             />
 
-            <v-textarea v-model="createData.notes" label="Notes (optional)" rows="2" class="mt-4" />
+            <v-textarea v-model="createData.notes" :label="t('views.subscriptions.createSubscriptionDialog.notesOptional')" rows="2" class="mt-4" />
           </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="createDialog = false">Cancel</v-btn>
-          <v-btn color="primary" :loading="creating" @click="createSubscription"> Create </v-btn>
+          <v-btn variant="text" @click="createDialog = false">{{ t('common.buttons.cancel') }}</v-btn>
+          <v-btn color="primary" :loading="creating" @click="createSubscription">{{ t('common.buttons.createSubscription') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -266,6 +266,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import api from '../services/api';
 import type {
   SubscriptionPattern,
@@ -295,15 +296,18 @@ import {
 } from '../composables';
 import { formatCurrency, SubscriptionPatternSchema } from '../utils';
 
+// i18n
+const { t } = useI18n();
+
 // Snackbar
 const { showSnackbar } = useSnackbar();
 
 // Wizard state
 const currentStep = ref(1);
-const wizardSteps = [
-  { title: 'Date Range', subtitle: 'Select transactions to analyze' },
-  { title: 'Find & Review', subtitle: 'Review and create subscriptions' },
-];
+const wizardSteps = computed(() => [
+  { title: t('common.steps.dateRange'), subtitle: t('common.steps.selectTransactionsToAnalyze') },
+  { title: t('common.steps.findReview'), subtitle: t('views.subscriptions.steps.findReview.subtitle') },
+]);
 
 // Step 1: Date range state
 const startDate = ref<string>();
@@ -339,13 +343,13 @@ const createData = reactive({
   notes: '',
 });
 
-const frequencyOptions = [
-  { text: 'Weekly', value: 'weekly' },
-  { text: 'Monthly', value: 'monthly' },
-  { text: 'Quarterly', value: 'quarterly' },
-  { text: 'Half-yearly', value: 'half-year' },
-  { text: 'Yearly', value: 'yearly' },
-];
+const frequencyOptions = computed(() => [
+  { text: t('views.subscriptions.frequencies.weekly'), value: 'weekly' },
+  { text: t('views.subscriptions.frequencies.monthly'), value: 'monthly' },
+  { text: t('views.subscriptions.frequencies.quarterly'), value: 'quarterly' },
+  { text: t('views.subscriptions.frequencies.halfYearly'), value: 'half-year' },
+  { text: t('views.subscriptions.frequencies.yearly'), value: 'yearly' },
+]);
 
 // Computed: Can proceed to next step
 const canProceed = computed(() => {
@@ -369,18 +373,18 @@ const stepLoading = computed(() => {
 const nextButtonText = computed(() => {
   switch (currentStep.value) {
     case 1:
-      return 'Find Subscriptions';
+      return t('common.buttons.findSubscriptions');
     default:
-      return 'Next';
+      return t('common.buttons.next');
   }
 });
 
 const statusMessage = computed(() => {
   if (currentStep.value === 1) {
-    if (preview.fetching.value) return 'Fetching...';
+    if (preview.fetching.value) return t('common.messages.fetching');
     if (preview.count.value === null) return '';
-    if (preview.count.value === 0) return 'No transactions found';
-    return `${preview.count.value} transactions`;
+    if (preview.count.value === 0) return t('common.messages.noTransactionsFound');
+    return t('common.labels.countTransactions', { count: preview.count.value });
   }
   return '';
 });
@@ -453,7 +457,7 @@ function handleStreamEvent(
         progressData.current || 0,
         progressData.total || 0,
         progressData.message ||
-          `Analyzing pattern ${progressData.current} of ${progressData.total}...`
+          t('views.subscriptions.analyzingPattern', { current: progressData.current, total: progressData.total })
       );
       break;
     }
@@ -471,7 +475,7 @@ function handleStreamEvent(
     }
     case 'error': {
       const errorData = event.data as { error: string };
-      showSnackbar(errorData?.error || 'An error occurred', 'error');
+      showSnackbar(errorData?.error || t('common.messages.somethingWentWrong'), 'error');
       break;
     }
     case 'complete':
@@ -499,14 +503,14 @@ async function findPatterns() {
 
     if (validationErrorCount.value > 0) {
       showSnackbar(
-        `${validationErrorCount.value} item(s) skipped due to data errors. Check console for details.`,
+        t('common.messages.itemsSkipped', { count: validationErrorCount.value }),
         'warning'
       );
     } else if (patterns.value.length > 0) {
-      showSnackbar(`Found ${patterns.value.length} subscription patterns`, 'info');
+      showSnackbar(t('views.subscriptions.foundPatterns', { count: patterns.value.length }), 'info');
     }
   } catch (error) {
-    showSnackbar(error instanceof Error ? error.message : 'Failed to find patterns', 'error');
+    showSnackbar(error instanceof Error ? error.message : t('views.subscriptions.failedToFindPatterns'), 'error');
   } finally {
     loading.value = false;
   }
@@ -522,16 +526,16 @@ function getSubscriptionBreakdownItems(
   breakdown: SubscriptionConfidenceBreakdown
 ): BreakdownItem[] {
   const items: BreakdownItem[] = [
-    { label: 'Interval Consistency', value: breakdown.intervalConsistency, max: 0.5 },
-    { label: 'Description Match', value: breakdown.descriptionSimilarity, max: 0.3 },
-    { label: 'Occurrence Count', value: breakdown.occurrenceCount, max: 0.15 },
-    { label: 'Amount Consistency', value: breakdown.amountConsistency, max: 0.05 },
+    { label: t('common.labels.intervalConsistency'), value: breakdown.intervalConsistency, max: 0.5 },
+    { label: t('common.labels.descriptionMatch'), value: breakdown.descriptionSimilarity, max: 0.3 },
+    { label: t('common.labels.occurrenceCount'), value: breakdown.occurrenceCount, max: 0.15 },
+    { label: t('common.labels.amountConsistency'), value: breakdown.amountConsistency, max: 0.05 },
   ];
 
   // Show payment service penalty if applicable
   if (breakdown.paymentServicePenalty < 0) {
     items.push({
-      label: 'Payment Service',
+      label: t('common.labels.paymentService'),
       value: breakdown.paymentServicePenalty,
       max: 0,
     });
@@ -587,11 +591,11 @@ function formatPatternType(pattern: SubscriptionPattern['pattern']): string {
   const { type, interval } = pattern;
 
   const typeLabels: Record<string, string> = {
-    weekly: 'Weekly',
-    monthly: 'Monthly',
-    quarterly: 'Quarterly',
-    'half-year': 'Half-yearly',
-    yearly: 'Yearly',
+    weekly: t('views.subscriptions.frequencies.weekly'),
+    monthly: t('views.subscriptions.frequencies.monthly'),
+    quarterly: t('views.subscriptions.frequencies.quarterly'),
+    'half-year': t('views.subscriptions.frequencies.halfYearly'),
+    yearly: t('views.subscriptions.frequencies.yearly'),
   };
 
   // interval 0 means every occurrence (no skip)
@@ -601,19 +605,19 @@ function formatPatternType(pattern: SubscriptionPattern['pattern']): string {
 
   // Special case for bi-weekly
   if (type === 'weekly' && interval === 1) {
-    return 'Every other week';
+    return t('views.subscriptions.everyOtherWeek');
   }
 
   // For other skip patterns (interval=1 means skip 1, so every 2nd occurrence)
   const unitLabels: Record<string, string> = {
-    weekly: 'weeks',
-    monthly: 'months',
-    quarterly: 'quarters',
-    'half-year': 'half-years',
-    yearly: 'years',
+    weekly: t('views.subscriptions.units.weeks'),
+    monthly: t('views.subscriptions.units.months'),
+    quarterly: t('views.subscriptions.units.quarters'),
+    'half-year': t('views.subscriptions.units.halfYears'),
+    yearly: t('views.subscriptions.units.years'),
   };
 
-  return `Every ${interval + 1} ${unitLabels[type] || type}`;
+  return t('views.subscriptions.everyInterval', { interval: interval + 1, unit: unitLabels[type] || type });
 }
 
 function openCreateDialog(pattern: SubscriptionPattern) {
@@ -676,7 +680,7 @@ async function createSubscription() {
   try {
     const firstTransaction = selectedPattern.value.transactions[0]?.attributes.transactions[0];
     if (!firstTransaction) {
-      throw new Error('No transaction data available');
+      throw new Error(t('views.subscriptions.noTransactionData'));
     }
 
     const request: CreateSubscriptionRequest = {
@@ -698,8 +702,8 @@ async function createSubscription() {
 
     showSnackbar(
       ruleCreated
-        ? 'Subscription and matching rule created successfully'
-        : 'Subscription created successfully',
+        ? t('views.subscriptions.subscriptionAndRuleCreated')
+        : t('views.subscriptions.subscriptionCreated'),
       'success'
     );
     createDialog.value = false;
@@ -707,7 +711,7 @@ async function createSubscription() {
     // Remove the pattern from the list
     patterns.value = patterns.value.filter((p) => p.id !== selectedPattern.value?.id);
   } catch (error) {
-    showSnackbar(error instanceof Error ? error.message : 'Failed to create subscription', 'error');
+    showSnackbar(error instanceof Error ? error.message : t('views.subscriptions.failedToCreateSubscription'), 'error');
   } finally {
     creating.value = false;
   }

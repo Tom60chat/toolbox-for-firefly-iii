@@ -35,19 +35,19 @@
           {{ appStore.isConnected ? 'mdi-check-circle' : 'mdi-alert-circle' }}
         </v-icon>
       </template>
-      {{ appStore.isConnected ? 'Connected to FireflyIII' : 'Disconnected from FireflyIII' }}
+      {{ appStore.isConnected ? t('components.appHeader.connectedToFirefly') : t('components.appHeader.disconnectedFromFirefly') }}
     </v-tooltip>
 
     <v-btn icon variant="text" @click="appStore.toggleDarkMode">
       <v-icon>{{ appStore.darkMode ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
       <v-tooltip activator="parent" location="bottom">
-        {{ appStore.darkMode ? 'Light mode' : 'Dark mode' }}
+        {{ appStore.darkMode ? t('components.appHeader.lightMode') : t('components.appHeader.darkMode') }}
       </v-tooltip>
     </v-btn>
 
     <v-btn icon variant="text" :href="fireflyUrl" target="_blank" :disabled="!fireflyUrl">
       <v-icon>mdi-open-in-new</v-icon>
-      <v-tooltip activator="parent" location="bottom"> Open FireflyIII </v-tooltip>
+      <v-tooltip activator="parent" location="bottom"> {{ t('components.appHeader.openFirefly') }} </v-tooltip>
     </v-btn>
 
     <v-menu>
@@ -60,7 +60,7 @@
       <v-list density="compact">
         <v-list-item
           prepend-icon="mdi-github"
-          title="View on GitHub"
+          :title="t('common.buttons.viewOnGitHub')"
           href="https://github.com/xenolphthalein/firefly-toolbox"
           target="_blank"
         />
@@ -68,7 +68,7 @@
         <v-list-item
           v-if="authStore.isAuthenticated"
           prepend-icon="mdi-logout"
-          title="Sign Out"
+          :title="t('common.buttons.signOut')"
           @click="handleLogout"
         />
       </v-list>
@@ -86,7 +86,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="showHelp = false">Close</v-btn>
+          <v-btn variant="text" @click="showHelp = false">{{ t('common.buttons.close') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -97,9 +97,11 @@
 import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
+import { useI18n } from 'vue-i18n';
 import { useAppStore } from '../../stores/app';
 import { useAuthStore } from '../../stores/auth';
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const appStore = useAppStore();
@@ -108,10 +110,18 @@ const { mobile } = useDisplay();
 const showHelp = ref(false);
 
 const currentPageTitle = computed(() => {
-  return (route.meta.title as string) || 'FireflyIII Toolbox';
+  const titleKey = route.meta.titleKey as string | undefined;
+  if (titleKey) {
+    return t(titleKey);
+  }
+  return (route.meta.title as string) || t('app.title');
 });
 
 const currentPageDescription = computed(() => {
+  const descriptionKey = route.meta.descriptionKey as string | undefined;
+  if (descriptionKey) {
+    return t(descriptionKey);
+  }
   return (route.meta.description as string) || '';
 });
 

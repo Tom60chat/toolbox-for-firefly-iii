@@ -19,10 +19,10 @@
           <!-- Row 1: File Upload -->
           <FileUploadCard
             v-model:file="uploadFile"
-            title="Upload PayPal Activity Report"
+            :title="t('views.paypal.uploadTitle')"
             accept=".csv,text/csv"
             file-icon="mdi-file-delimited"
-            accept-label="CSV files only"
+            :accept-label="t('views.paypal.acceptLabel')"
             :loading="uploading"
             @upload="uploadTransactions"
           />
@@ -32,7 +32,7 @@
             <v-card-title class="d-flex align-center justify-space-between py-2">
               <div class="d-flex align-center">
                 <v-icon class="mr-2">mdi-credit-card</v-icon>
-                Transactions Preview
+                {{ t('common.labels.transactionsPreview') }}
               </div>
               <v-chip
                 v-if="loadedTransactions.length > 0"
@@ -41,27 +41,27 @@
                 variant="tonal"
               >
                 <v-icon start size="small">mdi-swap-horizontal</v-icon>
-                {{ loadedTransactions.length }} transactions
+                {{ t('common.labels.countTransactions', { count: loadedTransactions.length }) }}
               </v-chip>
             </v-card-title>
             <v-card-text>
               <EmptyState
                 v-if="loadedTransactions.length === 0"
                 icon="mdi-credit-card-off"
-                title="No transactions loaded"
-                subtitle="Upload your PayPal activity report CSV file to see a preview"
+                :title="t('common.messages.noTransactionsLoaded')"
+                :subtitle="t('views.paypal.uploadFileToPreview')"
               />
               <template v-else>
                 <div class="preview-table-container">
                   <v-table density="compact" class="preview-table">
                     <thead>
                       <tr>
-                        <th>Date</th>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th class="text-right">Gross</th>
-                        <th class="text-right">Fee</th>
-                        <th>Status</th>
+                        <th>{{ t('common.labels.date') }}</th>
+                        <th>{{ t('common.labels.name') }}</th>
+                        <th>{{ t('common.labels.type') }}</th>
+                        <th class="text-right">{{ t('views.paypal.gross') }}</th>
+                        <th class="text-right">{{ t('views.paypal.fee') }}</th>
+                        <th>{{ t('common.labels.status') }}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -104,7 +104,7 @@
                   v-if="loadedTransactions.length > 10"
                   class="text-center text-caption text-medium-emphasis pt-3"
                 >
-                  Showing first 10 of {{ loadedTransactions.length }} transactions
+                  {{ t('common.labels.showingFirst', { count: loadedTransactions.length }) }}
                 </div>
               </template>
             </v-card-text>
@@ -127,8 +127,8 @@
           <template #options>
             <v-checkbox
               v-model="excludeProcessed"
-              label="Hide already processed transactions"
-              hint="Transactions tagged with 'FFIII Toolbox: PayPal Extender' will be excluded"
+            :label="t('common.labels.hideAlreadyProcessed')"
+            :hint="t('views.paypal.alreadyProcessedHint')"
               persistent-hint
               hide-details="auto"
               density="compact"
@@ -154,8 +154,8 @@
         <EmptyState
           v-if="!matching && matchResults.length === 0"
           icon="mdi-magnify"
-          title="Ready to match"
-          subtitle="Click 'Match Transactions' to find matches between your PayPal activity and Firefly transactions"
+          :title="t('common.messages.readyToMatch')"
+          :subtitle="t('common.messages.clickToMatchPaypal')"
         />
 
         <!-- Results -->
@@ -165,12 +165,12 @@
             :stats="[
               {
                 icon: 'mdi-check',
-                label: `${matchResults.filter((m) => m.matchedPayPalTransaction).length} matches`,
+                label: t('common.labels.countMatches', { count: matchResults.filter((m) => m.matchedPayPalTransaction).length }),
                 color: 'success',
               },
               {
                 icon: 'mdi-help',
-                label: `${matchResults.filter((m) => !m.matchedPayPalTransaction).length} unmatched`,
+                label: t('common.labels.countUnmatched', { count: matchResults.filter((m) => !m.matchedPayPalTransaction).length }),
                 color: 'grey',
               },
             ]"
@@ -178,8 +178,8 @@
             :selectable-count="matchResults.filter((m) => m.matchedPayPalTransaction).length"
             :all-selected="allMatchesSelected"
             :selected-count="selection.selected.value.length"
-            select-all-text="Select All Matches"
-            action-text="Apply Selected"
+            :select-all-text="t('common.labels.selectAllMatches')"
+            :action-text="t('common.buttons.applySelected')"
             action-color="success"
             action-icon="mdi-check-all"
             :action-loading="applying"
@@ -238,12 +238,12 @@
                           </span>
                         </template>
                         <div class="confidence-breakdown">
-                          <div class="font-weight-bold mb-1">Confidence Breakdown</div>
+                          <div class="font-weight-bold mb-1">{{ t('common.labels.confidenceBreakdown') }}</div>
                           <div
                             v-if="result.confidenceBreakdown.transactionCodeMatch > 0"
                             class="d-flex justify-space-between"
                           >
-                            <span>Transaction Code:</span>
+                            <span>{{ t('views.paypal.confidenceBreakdown.transactionCode') }}</span>
                             <span class="ml-3"
                               >+{{
                                 Math.round(result.confidenceBreakdown.transactionCodeMatch * 100)
@@ -254,7 +254,7 @@
                             v-if="result.confidenceBreakdown.bankReferenceMatch > 0"
                             class="d-flex justify-space-between"
                           >
-                            <span>Bank Reference:</span>
+                            <span>{{ t('views.paypal.confidenceBreakdown.bankReference') }}</span>
                             <span class="ml-3"
                               >+{{
                                 Math.round(result.confidenceBreakdown.bankReferenceMatch * 100)
@@ -265,7 +265,7 @@
                             v-if="result.confidenceBreakdown.amountMatch > 0"
                             class="d-flex justify-space-between"
                           >
-                            <span>Amount Match:</span>
+                            <span>{{ t('views.paypal.confidenceBreakdown.amountMatch') }}</span>
                             <span class="ml-3"
                               >+{{
                                 Math.round(result.confidenceBreakdown.amountMatch * 100)
@@ -276,7 +276,7 @@
                             v-if="result.confidenceBreakdown.exactAmountBonus > 0"
                             class="d-flex justify-space-between"
                           >
-                            <span>Exact Amount Bonus:</span>
+                            <span>{{ t('views.paypal.confidenceBreakdown.exactAmountBonus') }}</span>
                             <span class="ml-3"
                               >+{{
                                 Math.round(result.confidenceBreakdown.exactAmountBonus * 100)
@@ -287,7 +287,7 @@
                             v-if="result.confidenceBreakdown.dateProximity > 0"
                             class="d-flex justify-space-between"
                           >
-                            <span>Date Proximity:</span>
+                            <span>{{ t('views.paypal.confidenceBreakdown.dateProximity') }}</span>
                             <span class="ml-3"
                               >+{{
                                 Math.round(result.confidenceBreakdown.dateProximity * 100)
@@ -298,14 +298,14 @@
                             v-if="result.confidenceBreakdown.nameMatch > 0"
                             class="d-flex justify-space-between"
                           >
-                            <span>Name Match:</span>
+                            <span>{{ t('views.paypal.confidenceBreakdown.nameMatch') }}</span>
                             <span class="ml-3"
                               >+{{ Math.round(result.confidenceBreakdown.nameMatch * 100) }}%</span
                             >
                           </div>
                           <v-divider class="my-1" />
                           <div class="d-flex justify-space-between font-weight-bold">
-                            <span>Total:</span>
+                            <span>{{ t('views.paypal.confidenceBreakdown.total') }}</span>
                             <span class="ml-3"
                               >{{ Math.round(result.matchConfidence * 100) }}%</span
                             >
@@ -317,7 +317,7 @@
                         :score="result.matchConfidence"
                       />
                       <v-chip v-else size="small" color="grey" variant="outlined">
-                        No match
+                        {{ t('common.labels.noMatch') }}
                       </v-chip>
                     </div>
                   </div>
@@ -332,13 +332,13 @@
                       class="mb-3"
                       icon="mdi-link-variant"
                     >
-                      <strong>Matched PayPal:</strong>
+                      <strong>{{ t('views.paypal.matchedPaypal') }}:</strong>
                       <span class="ml-2">{{
                         result.matchedPayPalTransaction.transactionCode
                       }}</span>
                     </v-alert>
 
-                    <div class="text-subtitle-2 mb-2">PayPal Details:</div>
+                    <div class="text-subtitle-2 mb-2">{{ t('views.paypal.paypalDetails') }}:</div>
                     <v-list density="compact" class="bg-transparent">
                       <v-list-item class="px-0">
                         <template #prepend>
@@ -367,7 +367,7 @@
                           <v-icon size="small" class="mr-2">mdi-cash</v-icon>
                         </template>
                         <v-list-item-title class="text-body-2">
-                          Gross:
+                          {{ t('views.paypal.gross') }}:
                           {{
                             formatCurrency(
                               result.matchedPayPalTransaction.gross,
@@ -378,7 +378,7 @@
                             v-if="result.matchedPayPalTransaction.fee !== 0"
                             class="text-medium-emphasis"
                           >
-                            (Fee:
+                            ({{ t('views.paypal.fee') }}:
                             {{
                               formatCurrency(
                                 result.matchedPayPalTransaction.fee,
@@ -392,7 +392,7 @@
 
                     <v-divider class="my-3" />
 
-                    <div class="text-subtitle-2 mb-1">New Description:</div>
+                    <div class="text-subtitle-2 mb-1">{{ t('views.paypal.newDescription') }}:</div>
                     <v-text-field
                       v-model="customDescriptions[result.transactionId]"
                       density="compact"
@@ -401,7 +401,7 @@
                       class="mb-3"
                     />
 
-                    <div class="text-subtitle-2 mb-1">New Notes:</div>
+                    <div class="text-subtitle-2 mb-1">{{ t('views.paypal.newNotes') }}:</div>
                     <v-textarea
                       v-model="customNotes[result.transactionId]"
                       density="compact"
@@ -423,8 +423,8 @@
         <FinalActionButton
           v-if="currentStep === 3"
           :has-run="hasMatched"
-          text="Match Transactions"
-          rerun-text="Re-match"
+          :text="t('common.buttons.matchTransactions')"
+          :rerun-text="t('common.buttons.rematch')"
           icon="mdi-magnify"
           rerun-icon="mdi-refresh"
           :loading="matching"
@@ -437,6 +437,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import api from '../services/api';
 import type { PayPalTransaction, PayPalMatchResult } from '@shared/types/app';
 import {
@@ -464,13 +465,15 @@ import { formatCurrency, formatDate, PayPalMatchResultSchema, validateFileSize }
 // Snackbar
 const { showSnackbar } = useSnackbar();
 
+const { t } = useI18n();
+
 // Wizard state
 const currentStep = ref(1);
-const wizardSteps = [
-  { title: 'Upload Activity', subtitle: 'Load PayPal activity data' },
-  { title: 'Date Range', subtitle: 'Select transactions to match' },
-  { title: 'Match & Review', subtitle: 'Review and apply changes' },
-];
+const wizardSteps = computed(() => [
+  { title: t('views.paypal.steps.uploadActivity.title'), subtitle: t('views.paypal.steps.uploadActivity.subtitle') },
+  { title: t('common.steps.dateRange'), subtitle: t('common.steps.selectTransactionsToMatch') },
+  { title: t('common.steps.matchReview'), subtitle: t('common.steps.reviewAndApplyChanges') },
+]);
 
 // Step 1: Upload state
 const uploadFile = ref<File[]>([]);
@@ -535,24 +538,24 @@ const stepLoading = computed(() => {
 const nextButtonText = computed(() => {
   switch (currentStep.value) {
     case 1:
-      return 'Configure Date Range';
+      return t('views.paypal.buttons.configureDateRange');
     case 2:
-      return 'Match Transactions';
+      return t('common.buttons.matchTransactions');
     default:
-      return 'Next';
+      return t('common.buttons.next');
   }
 });
 
 const statusMessage = computed(() => {
   if (currentStep.value === 1) {
     if (loadedTransactions.value.length === 0) return '';
-    return `${loadedTransactions.value.length} transactions loaded`;
+    return t('common.labels.countTransactionsLoaded', { count: loadedTransactions.value.length });
   }
   if (currentStep.value === 2) {
-    if (preview.fetching.value) return 'Fetching...';
+    if (preview.fetching.value) return t('common.messages.fetching');
     if (preview.count.value === null) return '';
-    if (preview.count.value === 0) return 'No transactions found';
-    return `${preview.count.value} transactions`;
+    if (preview.count.value === 0) return t('common.messages.noTransactionsFound');
+    return t('common.labels.countTransactions', { count: preview.count.value });
   }
   return '';
 });
@@ -622,10 +625,10 @@ async function uploadTransactions(fileOrFiles: File | File[] | null) {
     });
 
     loadedTransactions.value = response.data.data.transactions;
-    showSnackbar(`Loaded ${loadedTransactions.value.length} PayPal transactions`, 'success');
+    showSnackbar(t('views.paypal.messages.transactionsLoaded', { count: loadedTransactions.value.length }), 'success');
   } catch (error) {
     console.error('Upload error:', error);
-    showSnackbar(error instanceof Error ? error.message : 'Failed to upload transactions', 'error');
+    showSnackbar(error instanceof Error ? error.message : t('views.paypal.messages.failedToUpload'), 'error');
   } finally {
     uploading.value = false;
     uploadFile.value = [];
@@ -683,7 +686,10 @@ function handleStreamEvent(
       progress.update(progressData.current || 0, progressData.total || 0);
       progress.message.value =
         progressData.message ||
-        `Matching transaction ${progressData.current} of ${progressData.total}...`;
+        t('common.messages.matchingTransaction', { 
+          current: progressData.current, 
+          total: progressData.total 
+        });
       break;
     }
     case 'result': {
@@ -704,11 +710,11 @@ function handleStreamEvent(
     }
     case 'error': {
       const errorData = event.data as { error: string };
-      showSnackbar(errorData?.error || 'An error occurred', 'error');
+      showSnackbar(errorData?.error || t('common.errors.anErrorOccurred'), 'error');
       break;
     }
     case 'complete':
-      progress.message.value = 'Complete!';
+      progress.message.value = t('common.messages.complete');
       break;
   }
 }
@@ -738,17 +744,17 @@ async function matchTransactions() {
     const matchCount = matchResults.value.filter((m) => m.matchedPayPalTransaction).length;
     if (validationErrorCount.value > 0) {
       showSnackbar(
-        `${validationErrorCount.value} item(s) skipped due to data errors. Check console for details.`,
+        t('common.messages.itemsSkipped', { count: validationErrorCount.value }),
         'warning'
       );
     } else if (matchCount > 0) {
       showSnackbar(
-        `Found ${matchCount} matches out of ${matchResults.value.length} transactions`,
+        t('views.paypal.messages.matchesFound', { matches: matchCount, total: matchResults.value.length }),
         'info'
       );
     }
   } catch (error) {
-    showSnackbar(error instanceof Error ? error.message : 'Failed to match transactions', 'error');
+    showSnackbar(error instanceof Error ? error.message : t('common.errors.failedToMatchTransactions'), 'error');
   } finally {
     matching.value = false;
   }
@@ -784,7 +790,12 @@ async function applySelected() {
     const result = response.data.data;
 
     showSnackbar(
-      `Updated ${result.successful.length} descriptions${result.failed.length > 0 ? `, ${result.failed.length} failed` : ''}`,
+      result.failed.length > 0
+        ? t('views.paypal.messages.descriptionsUpdatedWithFailed', { 
+            successful: result.successful.length, 
+            failed: result.failed.length 
+          })
+        : t('views.paypal.messages.descriptionsUpdated', { successful: result.successful.length }),
       result.failed.length > 0 ? 'warning' : 'success'
     );
 
@@ -793,7 +804,7 @@ async function applySelected() {
     );
     selection.clear();
   } catch (error) {
-    showSnackbar(error instanceof Error ? error.message : 'Failed to apply descriptions', 'error');
+    showSnackbar(error instanceof Error ? error.message : t('common.errors.failedToApplyDescriptions'), 'error');
   } finally {
     applying.value = false;
   }

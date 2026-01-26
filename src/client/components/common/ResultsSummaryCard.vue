@@ -18,7 +18,7 @@
             size="small"
             @click="$emit('toggle-select-all')"
           >
-            {{ allSelected ? 'Deselect All' : selectAllText }}
+            {{ allSelected ? t('common.buttons.deselectAll') : (selectAllText || t('common.buttons.selectAll')) }}
           </v-btn>
           <v-btn
             v-if="selectedCount > 0"
@@ -36,6 +36,9 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 export interface StatItem {
   label: string;
   value?: number | string;
@@ -72,8 +75,8 @@ withDefaults(
     selectableCount: 0,
     allSelected: false,
     selectedCount: 0,
-    selectAllText: 'Select All',
-    actionText: 'Apply Selected',
+    selectAllText: undefined,
+    actionText: undefined,
     actionColor: 'success',
     actionIcon: 'mdi-check-all',
     actionLoading: false,

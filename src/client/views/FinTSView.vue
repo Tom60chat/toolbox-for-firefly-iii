@@ -21,7 +21,7 @@
             <v-card-title class="d-flex align-center justify-space-between py-2">
               <div class="d-flex align-center">
                 <v-icon class="mr-2" size="small">mdi-bank</v-icon>
-                Bank Connection
+                {{ t('views.fints.bankConnection') }}
               </div>
               <div class="d-flex align-center ga-2">
                 <v-btn
@@ -31,7 +31,7 @@
                   :disabled="connecting || dialogState !== null"
                   @click="onLoadFullConfig"
                 >
-                  Load Config
+                  {{ t('common.buttons.loadConfig') }}
                 </v-btn>
                 <input
                   ref="fullConfigFileInput"
@@ -48,14 +48,14 @@
                 <v-col cols="12" md="6" class="pr-md-6">
                   <div class="text-subtitle-2 text-medium-emphasis mb-2 d-flex align-center">
                     <v-icon size="small" class="mr-1">mdi-domain</v-icon>
-                    Bank Selection
+                    {{ t('views.fints.bankSelection') }}
                   </div>
                   <v-autocomplete
                     v-model="selectedBank"
                     :items="knownBanks"
                     item-title="name"
                     item-value="blz"
-                    label="Select your bank"
+                    :label="t('views.fints.selectBank')"
                     variant="outlined"
                     density="compact"
                     clearable
@@ -67,7 +67,7 @@
                   >
                     <template #item="{ item, props: itemProps }">
                       <v-list-item v-bind="itemProps">
-                        <v-list-item-subtitle>BLZ: {{ item.raw.blz }}</v-list-item-subtitle>
+                        <v-list-item-subtitle>{{ t('common.labels.blz') }}: {{ item.raw.blz }}</v-list-item-subtitle>
                       </v-list-item>
                     </template>
                   </v-autocomplete>
@@ -85,7 +85,7 @@
                     <v-col cols="8">
                       <v-text-field
                         v-model="bankConfig.url"
-                        label="FinTS Server URL"
+                        :label="t('common.labels.fintsServerUrl')"
                         variant="outlined"
                         density="compact"
                         hide-details
@@ -99,13 +99,13 @@
                 <v-col cols="12" md="6" class="pl-md-6">
                   <div class="text-subtitle-2 text-medium-emphasis mb-2 d-flex align-center">
                     <v-icon size="small" class="mr-1">mdi-account-key</v-icon>
-                    Login Data
+                    {{ t('views.fints.loginData') }}
                   </div>
                   <v-row dense class="mb-2">
                     <v-col cols="6">
                       <v-text-field
                         v-model="bankConfig.userId"
-                        label="User ID"
+                        :label="t('common.labels.userId')"
                         variant="outlined"
                         density="compact"
                         hide-details
@@ -133,7 +133,7 @@
                         :items="accountOptions"
                         item-title="label"
                         item-value="value"
-                        label="Account"
+                        :label="t('common.labels.account')"
                         variant="outlined"
                         density="compact"
                         hide-details
@@ -143,7 +143,7 @@
                     <v-col cols="6" md="3">
                       <v-text-field
                         v-model="startDate"
-                        label="From"
+                        :label="t('common.labels.from')"
                         type="date"
                         variant="outlined"
                         density="compact"
@@ -154,7 +154,7 @@
                     <v-col cols="6" md="3">
                       <v-text-field
                         v-model="endDate"
-                        label="To"
+                        :label="t('common.labels.to')"
                         type="date"
                         variant="outlined"
                         density="compact"
@@ -174,7 +174,7 @@
                 :disabled="!dialogState"
                 @click="disconnect"
               >
-                Disconnect
+                {{ t('common.buttons.disconnect') }}
               </v-btn>
               <v-spacer />
               <v-btn
@@ -186,7 +186,7 @@
                 :disabled="!canConnect"
                 @click="connect"
               >
-                Connect to Bank
+                {{ t('common.buttons.connect') }}
               </v-btn>
               <v-btn
                 v-else
@@ -197,7 +197,7 @@
                 :disabled="!canFetch"
                 @click="fetchTransactions"
               >
-                Fetch Transactions
+                {{ t('common.buttons.fetchTransactions') }}
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -207,11 +207,11 @@
             <v-card-title class="d-flex align-center justify-space-between py-2">
               <div class="d-flex align-center">
                 <v-icon class="mr-2" size="small">mdi-table</v-icon>
-                Data Preview
+                {{ t('common.labels.dataPreview') }}
               </div>
               <v-chip v-if="fintsTransactions.length" size="small" color="success" variant="tonal">
                 <v-icon start size="small">mdi-table-row</v-icon>
-                {{ fintsTransactions.length }} transactions
+                {{ t('views.fints.transactionsCount', { count: fintsTransactions.length }) }}
               </v-chip>
             </v-card-title>
             <v-card-text class="pt-0">
@@ -225,8 +225,8 @@
               <EmptyState
                 v-else-if="fintsTransactions.length === 0"
                 icon="mdi-bank-transfer"
-                title="No transactions loaded"
-                subtitle="Connect to your bank and fetch transactions to see a preview"
+                :title="t('common.messages.noTransactionsLoaded')"
+                :subtitle="t('common.messages.connectToBankToPreview')"
               />
 
               <!-- Table when data exists -->
@@ -251,7 +251,7 @@
                   v-if="fintsTransactions.length > 10"
                   class="text-center text-caption text-medium-emphasis pt-3"
                 >
-                  Showing first 10 of {{ fintsTransactions.length }} transactions
+                  {{ t('common.labels.showingFirst10Transactions', { total: fintsTransactions.length }) }}
                 </div>
               </template>
             </v-card-text>
@@ -271,16 +271,16 @@
                   width="6"
                   class="mb-5"
                 />
-                <div class="text-h6 mb-2">Waiting for confirmation</div>
+                <div class="text-h6 mb-2">{{ t('common.messages.waitingForConfirmation') }}</div>
                 <div class="text-body-2 text-medium-emphasis mb-4">
-                  {{ tanRequest?.challengeText || 'Please confirm in your banking app' }}
+                  {{ tanRequest?.challengeText || t('common.messages.pleaseConfirmInBankingApp') }}
                 </div>
               </template>
 
               <!-- Manual TAN entry -->
               <template v-else>
                 <v-icon size="64" color="warning" class="mb-4">mdi-shield-key-outline</v-icon>
-                <div class="text-h6 mb-4">Enter TAN</div>
+                <div class="text-h6 mb-4">{{ t('common.labels.enterTan') }}</div>
                 <v-text-field
                   v-model="tanInput"
                   label="TAN"
@@ -303,7 +303,7 @@
                 :disabled="submittingTan || pollingTan"
                 @click="cancelTan"
               >
-                Cancel
+                {{ t('common.buttons.cancel') }}
               </v-btn>
               <v-btn
                 v-if="!isDecoupledTan"
@@ -314,7 +314,7 @@
                 :disabled="!tanInput"
                 @click="submitTan"
               >
-                Submit
+                {{ t('common.buttons.submit') }}
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -329,7 +329,7 @@
             <div class="d-flex align-center ga-3">
               <div class="d-flex align-center">
                 <v-icon class="mr-2">mdi-swap-horizontal</v-icon>
-                <span class="text-subtitle-1 font-weight-medium">Column Mapping</span>
+                <span class="text-subtitle-1 font-weight-medium">{{ t('common.labels.columnMapping') }}</span>
               </div>
               <v-menu>
                 <template #activator="{ props: menuProps }">
@@ -340,7 +340,7 @@
                     size="small"
                     prepend-icon="mdi-plus"
                   >
-                    Add Column
+                    {{ t('common.buttons.addColumn') }}
                   </v-btn>
                 </template>
                 <v-list density="compact" max-height="400">
@@ -353,7 +353,7 @@
                     <v-list-item-subtitle>{{ column.description }}</v-list-item-subtitle>
                     <template #append>
                       <v-chip v-if="column.required" size="x-small" color="error">
-                        Required
+                        {{ t('common.labels.required') }}
                       </v-chip>
                     </template>
                   </v-list-item>
@@ -363,7 +363,7 @@
             <div class="d-flex align-center ga-2">
               <v-btn icon variant="text" size="small" color="info" @click="showHelpDialog = true">
                 <v-icon>mdi-help-circle-outline</v-icon>
-                <v-tooltip activator="parent" location="bottom">How to use</v-tooltip>
+                <v-tooltip activator="parent" location="bottom">{{ t('common.buttons.howToUse') }}</v-tooltip>
               </v-btn>
               <v-btn
                 variant="tonal"
@@ -371,7 +371,7 @@
                 prepend-icon="mdi-content-save"
                 @click="onSaveConfig"
               >
-                Save Config
+                {{ t('common.buttons.saveConfig') }}
               </v-btn>
               <v-btn
                 variant="tonal"
@@ -379,7 +379,7 @@
                 prepend-icon="mdi-folder-open"
                 @click="onLoadConfig"
               >
-                Load Config
+                {{ t('common.buttons.loadConfig') }}
               </v-btn>
               <input
                 ref="configFileInput"
@@ -423,41 +423,40 @@
           <v-card rounded="lg">
             <v-card-title class="d-flex align-center">
               <v-icon class="mr-2" color="info">mdi-help-circle</v-icon>
-              How to Use Column Mapping
+              {{ t('common.help.howToUseColumnMapping') }}
             </v-card-title>
             <v-card-text>
               <v-list density="compact">
                 <v-list-item prepend-icon="mdi-numeric-1-circle">
-                  <v-list-item-title>Configure each column</v-list-item-title>
+                  <v-list-item-title>{{ t('common.help.configureEachColumn') }}</v-list-item-title>
                   <v-list-item-subtitle>
-                    Each card represents a Firefly III field. Add transformation blocks to map your
-                    bank data.
+                    {{ t('views.fints.help.step1Text') }}
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item prepend-icon="mdi-numeric-2-circle">
-                  <v-list-item-title>Add transformation blocks</v-list-item-title>
+                  <v-list-item-title>{{ t('common.help.addTransformationBlocks') }}</v-list-item-title>
                   <v-list-item-subtitle>
-                    Use blocks like "Source Column", "Static Value", "Replace", or "Conditional" to
-                    transform data.
+                    {{ t('common.help.addTransformationBlocksDesc') }}
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item prepend-icon="mdi-numeric-3-circle">
-                  <v-list-item-title>Drag and drop to reorder</v-list-item-title>
+                  <v-list-item-title>{{ t('common.help.dragAndDrop') }}</v-list-item-title>
                   <v-list-item-subtitle>
-                    Blocks are processed top to bottom. Drag to change the order.
+                    {{ t('common.help.dragAndDropDesc') }}
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item prepend-icon="mdi-numeric-4-circle">
-                  <v-list-item-title>Save your configuration</v-list-item-title>
+                  <v-list-item-title>{{ t('common.help.saveConfiguration') }}</v-list-item-title>
+                  <v-list-item-title>{{ t('common.help.saveConfiguration') }}</v-list-item-title>
                   <v-list-item-subtitle>
-                    Use "Save Config" to export your mapping for reuse with future imports.
+                    {{ t('views.fints.help.step4Text') }}
                   </v-list-item-subtitle>
                 </v-list-item>
               </v-list>
             </v-card-text>
             <v-card-actions>
               <v-spacer />
-              <v-btn color="primary" variant="text" @click="showHelpDialog = false"> Got it </v-btn>
+              <v-btn color="primary" variant="text" @click="showHelpDialog = false"> {{ t('common.buttons.gotIt') }} </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -471,7 +470,7 @@
             <v-card-title class="d-flex align-center justify-space-between">
               <div class="d-flex align-center">
                 <v-icon class="mr-2">mdi-eye</v-icon>
-                Preview
+                {{ t('common.labels.preview') }}
               </div>
               <v-btn
                 variant="text"
@@ -479,7 +478,7 @@
                 prepend-icon="mdi-refresh"
                 @click="() => converter.generatePreview(20)"
               >
-                Refresh
+                {{ t('common.buttons.refresh') }}
               </v-btn>
             </v-card-title>
             <v-card-text>
@@ -487,15 +486,15 @@
               <div class="d-flex align-center ga-4 mb-4 flex-shrink-0">
                 <v-chip color="primary" variant="tonal">
                   <v-icon start>mdi-table-row</v-icon>
-                  {{ fintsTransactions.length }} input transactions
+                  {{ t('views.fints.inputTransactions', { count: fintsTransactions.length }) }}
                 </v-chip>
                 <v-chip v-if="converter.preview.value?.removedRows" color="warning" variant="tonal">
                   <v-icon start>mdi-table-row-remove</v-icon>
-                  {{ converter.preview.value.removedRows }} rows removed
+                  {{ t('common.labels.countRowsRemoved', { count: converter.preview.value.removedRows }) }}
                 </v-chip>
                 <v-chip color="success" variant="tonal">
                   <v-icon start>mdi-table-column</v-icon>
-                  {{ enabledColumnCount }} output columns
+                  {{ t('common.labels.countOutputColumns', { count: enabledColumnCount }) }}
                 </v-chip>
               </div>
 
@@ -507,10 +506,10 @@
                 density="compact"
                 class="mb-4 flex-shrink-0"
               >
-                <strong>{{ converter.preview.value.errors.length }} errors detected:</strong>
+                <strong>{{ t('common.labels.countErrorsDetected', { count: converter.preview.value.errors.length }) }}</strong>
                 <ul class="mt-2 mb-0">
                   <li v-for="(error, idx) in converter.preview.value.errors.slice(0, 5)" :key="idx">
-                    Row {{ error.row }}: {{ error.message }}
+                    {{ t('common.labels.rowError', { row: error.row, message: error.message }) }}
                   </li>
                 </ul>
               </v-alert>
@@ -538,8 +537,8 @@
               <EmptyState
                 v-else
                 icon="mdi-table-off"
-                title="No preview available"
-                subtitle="Configure your column mapping to see a preview"
+                :title="t('common.messages.noPreviewAvailable')"
+                :subtitle="t('common.help.configureMappingToPreview')"
               />
             </v-card-text>
           </v-card>
@@ -550,12 +549,12 @@
               <v-card rounded="lg" class="flex-grow-1 d-flex flex-column">
                 <v-card-title class="d-flex align-center py-3">
                   <v-icon class="mr-2" size="small">mdi-download</v-icon>
-                  Export CSV
+                  {{ t('common.buttons.exportCSV') }}
                 </v-card-title>
                 <v-card-text class="pt-0 flex-grow-1">
                   <v-text-field
                     v-model="exportFilename"
-                    label="Output Filename"
+                    :label="t('common.labels.outputFilename')"
                     variant="outlined"
                     density="compact"
                     suffix=".csv"
@@ -567,7 +566,7 @@
                       <v-select
                         v-model="converter.config.value.exportOptions.delimiter"
                         :items="delimiterOptions"
-                        label="Delimiter"
+                        :label="t('common.labels.delimiter')"
                         variant="outlined"
                         density="compact"
                         hide-details
@@ -577,7 +576,7 @@
                       <v-select
                         v-model="converter.config.value.exportOptions.quoteChar"
                         :items="quoteCharOptions"
-                        label="Quote"
+                        :label="t('views.fints.quote')"
                         variant="outlined"
                         density="compact"
                         hide-details
@@ -587,7 +586,7 @@
                       <v-select
                         v-model="converter.config.value.exportOptions.quoteMode"
                         :items="quoteModeOptions"
-                        label="Quoting"
+                        :label="t('components.converter.quoting')"
                         variant="outlined"
                         density="compact"
                         hide-details
@@ -597,7 +596,7 @@
                       <v-select
                         v-model="converter.config.value.exportOptions.lineEnding"
                         :items="lineEndingOptions"
-                        label="Line Ending"
+                        :label="t('components.converter.lineEnding.label')"
                         variant="outlined"
                         density="compact"
                         hide-details
@@ -614,7 +613,7 @@
                     prepend-icon="mdi-download"
                     @click="onDownloadCSV"
                   >
-                    Download CSV
+                    {{ t('common.buttons.downloadCSV') }}
                   </v-btn>
                 </v-card-actions>
               </v-card>
@@ -625,15 +624,15 @@
               <v-card rounded="lg">
                 <v-card-title class="d-flex align-center py-3">
                   <v-icon class="mr-2" size="small">mdi-cloud-upload</v-icon>
-                  Import to Firefly III
+                  {{ t('views.fints.importToFirefly') }}
                 </v-card-title>
                 <v-card-text class="pt-0">
                   <!-- Import Options -->
                   <v-text-field
                     v-model="importOptions.tags"
-                    label="Add Tags"
-                    placeholder="fints-import, ..."
-                    hint="Comma-separated tags to add to all imported transactions"
+                    :label="t('views.fints.addTags')"
+                    :placeholder="t('views.fints.tagsPlaceholder')"
+                    :hint="t('views.fints.tagsHint')"
                     persistent-hint
                     variant="outlined"
                     density="compact"
@@ -645,7 +644,7 @@
                     <v-col cols="6">
                       <v-checkbox
                         v-model="importOptions.applyRules"
-                        label="Apply Firefly III rules"
+                        :label="t('views.fints.applyRules')"
                         density="compact"
                         hide-details
                       />
@@ -653,7 +652,7 @@
                     <v-col cols="6">
                       <v-checkbox
                         v-model="importOptions.errorIfDuplicate"
-                        label="Skip duplicates"
+                        :label="t('common.labels.skipDuplicates')"
                         density="compact"
                         hide-details
                       />
@@ -668,7 +667,7 @@
                     density="compact"
                     class="mb-4"
                   >
-                    Ready to import {{ importValidation.summary.validRows }} transactions
+                    {{ t('common.labels.readyToImportCount', { count: importValidation.summary.validRows }) }}
                   </v-alert>
 
                   <v-alert
@@ -678,7 +677,7 @@
                     density="compact"
                     class="mb-4"
                   >
-                    <div class="font-weight-medium mb-1">Cannot import: validation errors</div>
+                    <div class="font-weight-medium mb-1">{{ t('views.fints.cannotImportValidation') }}</div>
                     <ul class="mb-0 pl-4">
                       <li
                         v-for="(err, idx) in importValidation.errors.slice(0, 5)"
@@ -701,7 +700,7 @@
                     :disabled="!importValidation?.valid"
                     @click="showImportDialog = true"
                   >
-                    Import to Firefly III
+                    {{ t('views.fints.importToFirefly') }}
                   </v-btn>
                 </v-card-actions>
               </v-card>
@@ -716,20 +715,19 @@
       <v-card rounded="lg">
         <v-card-title class="d-flex align-center">
           <v-icon class="mr-2" color="success">mdi-cloud-upload</v-icon>
-          Confirm Import
+          {{ t('common.buttons.confirmImport') }}
         </v-card-title>
         <v-card-text>
           <p class="mb-4">
-            This will create
-            <strong>{{ importValidation?.summary.validRows || 0 }}</strong> transactions in Firefly
-            III.
+            {{ t('views.fints.thisWillCreate') }}
+            <strong>{{ importValidation?.summary.validRows || 0 }}</strong> {{ t('views.fints.transactionsInFirefly') }}
           </p>
 
           <!-- Import settings summary -->
           <div class="d-flex flex-wrap ga-2 mb-4">
             <v-chip v-if="importOptions.tags" size="small" color="primary" variant="tonal">
               <v-icon start size="small">mdi-tag</v-icon>
-              Tags: {{ importOptions.tags }}
+              {{ t('views.fints.tagsLabel', { tags: importOptions.tags }) }}
             </v-chip>
             <v-chip
               size="small"
@@ -739,7 +737,7 @@
               <v-icon start size="small">{{
                 importOptions.applyRules ? 'mdi-check' : 'mdi-close'
               }}</v-icon>
-              Rules
+              {{ t('common.labels.rules') }}
             </v-chip>
             <v-chip
               size="small"
@@ -749,7 +747,7 @@
               <v-icon start size="small">{{
                 importOptions.errorIfDuplicate ? 'mdi-check' : 'mdi-close'
               }}</v-icon>
-              Skip duplicates
+              {{ t('common.labels.skipDuplicates') }}
             </v-chip>
           </div>
 
@@ -766,8 +764,7 @@
               class="mb-2"
             />
             <div class="text-caption text-center text-medium-emphasis">
-              {{ converter.importProgress.value.current }} /
-              {{ converter.importProgress.value.total }} transactions
+              {{ t('views.fints.transactionsProgress', { current: converter.importProgress.value.current, total: converter.importProgress.value.total }) }}
             </div>
           </div>
 
@@ -777,17 +774,17 @@
             variant="tonal"
             density="compact"
           >
-            <strong>Warning:</strong> Duplicate transactions may be created since "Skip duplicates"
-            is disabled.
+            <strong>{{ t('common.labels.warning') }}:</strong> {{ t('views.converter.duplicateWarning') }}
+            {{ t('views.fints.duplicateWarningDisabled') }}
           </v-alert>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn variant="text" :disabled="importing" @click="showImportDialog = false">
-            Cancel
+            {{ t('common.buttons.cancel') }}
           </v-btn>
           <v-btn color="success" variant="flat" :loading="importing" @click="onImportToFirefly">
-            Import
+            {{ t('common.buttons.import') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -800,17 +797,17 @@
           <v-icon class="mr-2" :color="importResults?.failed === 0 ? 'success' : 'warning'">
             {{ importResults?.failed === 0 ? 'mdi-check-circle' : 'mdi-alert-circle' }}
           </v-icon>
-          Import Complete
+          {{ t('common.messages.importComplete') }}
         </v-card-title>
         <v-card-text>
           <div class="d-flex ga-4 mb-4">
             <v-chip color="success" variant="tonal">
               <v-icon start>mdi-check</v-icon>
-              {{ importResults?.successful || 0 }} imported
+              {{ t('views.fints.imported', { count: importResults?.successful || 0 }) }}
             </v-chip>
             <v-chip v-if="importResults?.failed" color="error" variant="tonal">
               <v-icon start>mdi-close</v-icon>
-              {{ importResults.failed }} failed
+              {{ t('views.fints.failed', { count: importResults.failed }) }}
             </v-chip>
           </div>
 
@@ -820,7 +817,7 @@
             variant="tonal"
             density="compact"
           >
-            <div class="font-weight-medium mb-2">Errors:</div>
+            <div class="font-weight-medium mb-2">{{ t('common.labels.errors') }}:</div>
             <ul class="mb-0 pl-4">
               <li
                 v-for="(err, idx) in importResults.errors.slice(0, 10)"
@@ -831,14 +828,14 @@
               </li>
             </ul>
             <div v-if="importResults.errors.length > 10" class="text-caption mt-2">
-              ... and {{ importResults.errors.length - 10 }} more errors
+              {{ t('views.fints.andMoreErrors', { count: importResults.errors.length - 10 }) }}
             </div>
           </v-alert>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn variant="flat" color="primary" @click="showImportResultsDialog = false">
-            Close
+            {{ t('common.buttons.close') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -848,6 +845,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { onBeforeRouteLeave } from 'vue-router';
 import draggable from 'vuedraggable';
 import api from '../services/api';
@@ -871,13 +869,15 @@ interface KnownBank {
   url: string;
 }
 
+const { t } = useI18n();
+
 // Wizard state
 const currentStep = ref(1);
-const wizardSteps = [
-  { title: 'Connect & Fetch', subtitle: 'Load bank transactions' },
-  { title: 'Transform', subtitle: 'Map columns' },
-  { title: 'Preview & Export', subtitle: 'Review and import' },
-];
+const wizardSteps = computed(() => [
+  { title: t('common.steps.connectFetch'), subtitle: t('common.steps.loadBankTransactions') },
+  { title: t('views.fints.steps.transform.title'), subtitle: t('views.fints.steps.transform.subtitle') },
+  { title: t('common.steps.previewExport'), subtitle: t('common.steps.reviewAndImport') },
+]);
 
 // Step 1: Connection state
 const knownBanks = ref<KnownBank[]>([]);
@@ -936,7 +936,7 @@ function getDefaultImportTag() {
   const now = new Date();
   const date = now.toLocaleDateString('en-CA'); // YYYY-MM-DD format
   const time = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); // HH:MM format
-  return `FFIII Toolbox: FinTS Import on ${date} @ ${time}`;
+  return t('views.fints.defaultImportTag', { date, time });
 }
 
 const importOptions = reactive({
@@ -947,28 +947,28 @@ const importOptions = reactive({
 const importing = ref(false);
 
 // CSV export options
-const delimiterOptions = [
-  { title: 'Comma (,)', value: ',' },
-  { title: 'Semicolon (;)', value: ';' },
-  { title: 'Tab', value: '\t' },
-  { title: 'Pipe (|)', value: '|' },
-];
+const delimiterOptions = computed(() => [
+  { title: t('common.csvOptions.comma'), value: ',' },
+  { title: t('common.csvOptions.semicolon'), value: ';' },
+  { title: t('common.csvOptions.tab'), value: '\t' },
+  { title: t('common.csvOptions.pipe'), value: '|' },
+]);
 
-const quoteCharOptions = [
-  { title: 'Double Quote (")', value: '"' },
-  { title: "Single Quote (')", value: "'" },
-];
+const quoteCharOptions = computed(() => [
+  { title: t('common.csvOptions.doubleQuote'), value: '"' },
+  { title: t('common.csvOptions.singleQuote'), value: "'" },
+]);
 
-const quoteModeOptions = [
-  { title: 'When needed', value: 'needed' },
-  { title: 'Always', value: 'always' },
-  { title: 'Never', value: 'never' },
-];
+const quoteModeOptions = computed(() => [
+  { title: t('views.fints.csvOptions.whenNeeded'), value: 'needed' },
+  { title: t('common.csvOptions.always'), value: 'always' },
+  { title: t('common.csvOptions.never'), value: 'never' },
+]);
 
-const lineEndingOptions = [
-  { title: 'LF (Unix/Mac)', value: 'lf' },
-  { title: 'CRLF (Windows)', value: 'crlf' },
-];
+const lineEndingOptions = computed(() => [
+  { title: t('views.fints.csvOptions.lfUnix'), value: 'lf' },
+  { title: t('views.fints.csvOptions.crlfWindows'), value: 'crlf' },
+]);
 const importValidation = ref<ImportValidation | null>(null);
 const showImportDialog = ref(false);
 const showImportResultsDialog = ref(false);
@@ -1051,7 +1051,7 @@ const accountOptions = computed(() => {
   if (!dialogState.value?.accounts) return [];
   return dialogState.value.accounts.map((acc, idx) => ({
     value: idx,
-    label: `${acc.ownerName || 'Account'} - ${acc.iban || acc.accountNumber}`,
+    label: `${acc.ownerName || t('common.labels.account')} - ${acc.iban || acc.accountNumber}`,
   }));
 });
 
@@ -1077,31 +1077,31 @@ const stepLoading = computed(() => {
 const nextButtonText = computed(() => {
   switch (currentStep.value) {
     case 1:
-      return 'Configure Mapping';
+      return t('common.steps.configureMapping');
     case 2:
-      return 'Preview & Export';
+      return t('common.steps.previewExport');
     default:
-      return 'Next';
+      return t('common.buttons.next');
   }
 });
 
 const statusMessage = computed(() => {
   if (currentStep.value === 1) {
     if (fintsTransactions.value.length > 0) {
-      return `${fintsTransactions.value.length} transactions loaded`;
+      return t('common.labels.countTransactionsLoaded', { count: fintsTransactions.value.length });
     }
     if (dialogState.value) {
-      return `Connected - ${dialogState.value.accounts?.length || 0} account(s)`;
+      return t('views.fints.connectedAccounts', { count: dialogState.value.accounts?.length || 0 });
     }
     return '';
   }
   if (currentStep.value === 2) {
     const enabled = converter.config.value.swimlanes.filter((s) => s.enabled).length;
-    return `${enabled} columns configured`;
+    return t('views.fints.columnsConfigured', { count: enabled });
   }
   if (currentStep.value === 3) {
     if (importValidation.value?.valid) {
-      return `${importValidation.value.summary.validRows} ready to import`;
+      return t('views.fints.readyToImportStatus', { count: importValidation.value.summary.validRows });
     }
   }
   return '';
@@ -1196,10 +1196,10 @@ async function connect() {
         startPolling();
       }
     } else {
-      showSnackbar('Connected successfully!', 'success');
+      showSnackbar(t('views.fints.messages.connectedSuccessfully'), 'success');
     }
   } catch (error) {
-    showSnackbar(error instanceof Error ? error.message : 'Failed to connect to bank', 'error');
+    showSnackbar(error instanceof Error ? error.message : t('views.fints.messages.failedToConnect'), 'error');
   } finally {
     connecting.value = false;
   }
@@ -1216,9 +1216,9 @@ async function submitTan() {
     showTanDialog.value = false;
     tanInput.value = '';
     tanRequest.value = null;
-    showSnackbar('TAN verified successfully!', 'success');
+    showSnackbar(t('views.fints.messages.tanVerified'), 'success');
   } catch (error) {
-    showSnackbar(error instanceof Error ? error.message : 'Failed to verify TAN', 'error');
+    showSnackbar(error instanceof Error ? error.message : t('views.fints.messages.failedToVerifyTan'), 'error');
   } finally {
     submittingTan.value = false;
   }
@@ -1268,7 +1268,7 @@ async function pollTanStatus() {
       tanRequest.value = null;
       availableTanMethods.value = [];
       selectedTanMethodId.value = '';
-      showSnackbar('Authentication confirmed!', 'success');
+      showSnackbar(t('views.fints.messages.authenticationConfirmed'), 'success');
     } else if (state.tanRequest?.challengeText !== tanRequest.value?.challengeText) {
       tanRequest.value = state.tanRequest || null;
     }
@@ -1292,14 +1292,14 @@ async function disconnect() {
 // Fetch transactions from bank
 async function fetchTransactions() {
   if (!selectedAccount.value || !startDate.value || !endDate.value) {
-    showSnackbar('Please select an account and date range', 'warning');
+    showSnackbar(t('views.fints.messages.selectAccountAndDate'), 'warning');
     return;
   }
 
   fetching.value = true;
   fintsTransactions.value = [];
   progress.reset();
-  progress.message.value = 'Fetching transactions from bank...';
+  progress.message.value = t('views.fints.messages.fetchingTransactions');
 
   try {
     const response = await api.post(
@@ -1315,12 +1315,12 @@ async function fetchTransactions() {
     fintsTransactions.value = response.data.data.transactions || [];
 
     if (fintsTransactions.value.length > 0) {
-      showSnackbar(`Loaded ${fintsTransactions.value.length} transactions from bank`, 'success');
+      showSnackbar(t('views.fints.messages.loadedTransactions', { count: fintsTransactions.value.length }), 'success');
     } else {
-      showSnackbar('No transactions found in the selected date range', 'info');
+      showSnackbar(t('views.fints.messages.noTransactionsInRange'), 'info');
     }
   } catch (error) {
-    showSnackbar(error instanceof Error ? error.message : 'Failed to fetch transactions', 'error');
+    showSnackbar(error instanceof Error ? error.message : t('views.fints.messages.failedToFetch'), 'error');
   } finally {
     fetching.value = false;
   }
@@ -1433,9 +1433,9 @@ function onConfigFileSelected(event: Event) {
         // Just converter config
         converter.loadConfig(json);
       }
-      showSnackbar('Configuration loaded successfully', 'success');
+      showSnackbar(t('views.fints.messages.configLoaded'), 'success');
     } catch {
-      showSnackbar('Failed to load configuration', 'error');
+      showSnackbar(t('views.fints.messages.failedToLoadConfig'), 'error');
     }
   };
   reader.readAsText(file);
@@ -1488,10 +1488,10 @@ function onFullConfigFileSelected(event: Event) {
         converter.loadConfig(JSON.stringify(config.converter));
       }
 
-      showSnackbar('Configuration loaded! Enter your PIN to connect.', 'success');
+      showSnackbar(t('views.fints.messages.configLoadedEnterPin'), 'success');
     } catch (err) {
       console.error('Failed to load config:', err);
-      showSnackbar('Failed to load configuration', 'error');
+      showSnackbar(t('views.fints.messages.failedToLoadConfig'), 'error');
     }
   };
   reader.readAsText(file);
@@ -1526,7 +1526,7 @@ async function onImportToFirefly() {
     showImportResultsDialog.value = true;
   } catch (error) {
     showImportDialog.value = false;
-    showSnackbar(error instanceof Error ? error.message : 'Failed to import transactions', 'error');
+    showSnackbar(error instanceof Error ? error.message : t('views.fints.messages.failedToFetch'), 'error');
   } finally {
     importing.value = false;
   }

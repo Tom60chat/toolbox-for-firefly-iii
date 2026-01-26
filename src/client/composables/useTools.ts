@@ -1,4 +1,5 @@
 import { computed, type ComputedRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useAppStore } from '../stores/app';
 
 /**
@@ -7,12 +8,12 @@ import { useAppStore } from '../stores/app';
 export interface ToolUIConfig {
   /** Unique identifier matching backend tool name */
   id: string;
-  /** Display name for the tool */
-  title: string;
-  /** Short description for navigation/sidebar */
-  subtitle: string;
-  /** Long description for dashboard cards */
-  description: string;
+  /** i18n key for navigation title */
+  titleKey: string;
+  /** i18n key for navigation subtitle */
+  subtitleKey: string;
+  /** i18n key for dashboard description */
+  descriptionKey: string;
   /** Material Design icon name */
   icon: string;
   /** Color theme for the tool card */
@@ -24,12 +25,28 @@ export interface ToolUIConfig {
 }
 
 /**
- * Tool with computed disabled state based on backend status
+ * Tool with computed disabled state and resolved translations
  */
-export interface ToolWithStatus extends ToolUIConfig {
-  /** Whether the tool is currently disabled (from backend) */
+export interface ToolWithStatus {
+  /** Unique identifier */
+  id: string;
+  /** Resolved display name */
+  title: string;
+  /** Resolved short description */
+  subtitle: string;
+  /** Resolved long description */
+  description: string;
+  /** Material Design icon name */
+  icon: string;
+  /** Color theme */
+  color: string;
+  /** Vue Router route path */
+  route: string;
+  /** Whether this tool requires AI */
+  requiresAI: boolean;
+  /** Whether the tool is currently disabled */
   disabled: boolean;
-  /** Reason why the tool is disabled (if applicable) */
+  /** Reason why the tool is disabled */
   disabledReason: string;
 }
 
@@ -39,9 +56,9 @@ export interface ToolWithStatus extends ToolUIConfig {
 export const TOOL_UI_CONFIG: Record<string, ToolUIConfig> = {
   duplicateFinder: {
     id: 'duplicateFinder',
-    title: 'Duplicate Finder',
-    subtitle: 'Find duplicates',
-    description: 'Scan your transactions for potential duplicates and manage them easily.',
+    titleKey: 'navigation.duplicates',
+    subtitleKey: 'navigation.findDuplicates',
+    descriptionKey: 'views.home.toolDescriptions.duplicateFinder',
     icon: 'mdi-content-copy',
     color: 'blue',
     route: '/duplicates',
@@ -49,9 +66,9 @@ export const TOOL_UI_CONFIG: Record<string, ToolUIConfig> = {
   },
   subscriptionFinder: {
     id: 'subscriptionFinder',
-    title: 'Subscription Finder',
-    subtitle: 'Track recurring expenses',
-    description: 'Detect recurring transaction patterns and create recurring transactions.',
+    titleKey: 'navigation.subscriptions',
+    subtitleKey: 'navigation.trackRecurringExpenses',
+    descriptionKey: 'views.home.toolDescriptions.subscriptionFinder',
     icon: 'mdi-credit-card-clock',
     color: 'purple',
     route: '/subscriptions',
@@ -59,9 +76,9 @@ export const TOOL_UI_CONFIG: Record<string, ToolUIConfig> = {
   },
   aiCategorySuggestions: {
     id: 'aiCategorySuggestions',
-    title: 'AI Category Suggestions',
-    subtitle: 'Smart suggestions',
-    description: 'Get smart category suggestions for uncategorized transactions using AI.',
+    titleKey: 'navigation.categories',
+    subtitleKey: 'navigation.smartSuggestions',
+    descriptionKey: 'views.home.toolDescriptions.aiCategories',
     icon: 'mdi-shape',
     color: 'teal',
     route: '/categories',
@@ -69,9 +86,9 @@ export const TOOL_UI_CONFIG: Record<string, ToolUIConfig> = {
   },
   aiTagSuggestions: {
     id: 'aiTagSuggestions',
-    title: 'AI Tag Suggestions',
-    subtitle: 'Tag suggestions',
-    description: 'Receive intelligent tag recommendations based on transaction content.',
+    titleKey: 'navigation.tags',
+    subtitleKey: 'navigation.tagSuggestions',
+    descriptionKey: 'views.home.toolDescriptions.aiTags',
     icon: 'mdi-tag-multiple',
     color: 'orange',
     route: '/tags',
@@ -79,9 +96,9 @@ export const TOOL_UI_CONFIG: Record<string, ToolUIConfig> = {
   },
   amazonExtender: {
     id: 'amazonExtender',
-    title: 'Amazon Order Extender',
-    subtitle: 'Order details',
-    description: 'Match Amazon transactions with order details for better descriptions.',
+    titleKey: 'navigation.amazon',
+    subtitleKey: 'navigation.orderDetails',
+    descriptionKey: 'views.home.toolDescriptions.amazonExtender',
     icon: 'mdi-package-variant',
     color: 'amber',
     route: '/amazon',
@@ -89,9 +106,9 @@ export const TOOL_UI_CONFIG: Record<string, ToolUIConfig> = {
   },
   paypalExtender: {
     id: 'paypalExtender',
-    title: 'PayPal Extender',
-    subtitle: 'Payment details',
-    description: 'Match PayPal transactions with activity report details for better descriptions.',
+    titleKey: 'navigation.paypal',
+    subtitleKey: 'navigation.paymentDetails',
+    descriptionKey: 'views.home.toolDescriptions.paypalExtender',
     icon: 'mdi-credit-card-outline',
     color: 'indigo',
     route: '/paypal',
@@ -99,10 +116,9 @@ export const TOOL_UI_CONFIG: Record<string, ToolUIConfig> = {
   },
   bankConverter: {
     id: 'bankConverter',
-    title: 'CSV Importer',
-    subtitle: 'Import bank exports',
-    description:
-      'Convert and import bank CSV exports into Firefly III with column mapping and transformations.',
+    titleKey: 'navigation.converter',
+    subtitleKey: 'navigation.importBankExports',
+    descriptionKey: 'views.home.toolDescriptions.csvImporter',
     icon: 'mdi-database-import',
     color: 'green',
     route: '/converter',
@@ -110,9 +126,9 @@ export const TOOL_UI_CONFIG: Record<string, ToolUIConfig> = {
   },
   fintsImporter: {
     id: 'fintsImporter',
-    title: 'FinTS Importer',
-    subtitle: 'Direct bank import',
-    description: 'Connect directly to your German bank via FinTS/HBCI to import transactions.',
+    titleKey: 'navigation.fints',
+    subtitleKey: 'navigation.directBankImport',
+    descriptionKey: 'views.home.toolDescriptions.fintsImporter',
     icon: 'mdi-bank-transfer',
     color: 'cyan',
     route: '/fints',
@@ -147,6 +163,7 @@ export interface UseToolsReturn {
  * Composable for accessing tool definitions with availability from backend
  */
 export function useTools(): UseToolsReturn {
+  const { t } = useI18n();
   const appStore = useAppStore();
 
   const configs = TOOL_ORDER.map((id) => TOOL_UI_CONFIG[id]).filter(Boolean);
@@ -164,16 +181,23 @@ export function useTools(): UseToolsReturn {
       let disabledReason = '';
       if (!available && backendStatus?.requiresConfig) {
         if (backendStatus.requiresConfig.includes('FINTS_PRODUCT_ID')) {
-          disabledReason = 'FinTS Product ID required';
+          disabledReason = t('tools.requiresConfiguration.fints');
         } else if (backendStatus.requiresConfig.includes('AI_PROVIDER')) {
-          disabledReason = 'Configure AI first';
+          disabledReason = t('tools.requiresConfiguration.ai');
         } else if (backendStatus.requiresConfig.includes('FIREFLY_API_URL')) {
-          disabledReason = 'Connect to FireflyIII first';
+          disabledReason = t('tools.requiresConfiguration.firefly');
         }
       }
 
       return {
-        ...uiConfig,
+        id: uiConfig.id,
+        title: t(uiConfig.titleKey),
+        subtitle: t(uiConfig.subtitleKey),
+        description: t(uiConfig.descriptionKey),
+        icon: uiConfig.icon,
+        color: uiConfig.color,
+        route: uiConfig.route,
+        requiresAI: uiConfig.requiresAI,
         disabled: !available,
         disabledReason,
       };

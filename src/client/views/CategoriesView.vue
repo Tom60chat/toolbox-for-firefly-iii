@@ -8,15 +8,13 @@
       class="mb-4"
       prominent
     >
-      <v-alert-title>Data Sharing Acknowledgment Required</v-alert-title>
+      <v-alert-title>{{ t('common.ai.acknowledgmentRequired') }}</v-alert-title>
       <p class="mb-3">
-        This feature uses an external AI provider ({{ appStore.aiProvider }}) which requires sending
-        your transaction data to third-party servers. Please review and acknowledge the data sharing
-        policy before using AI features.
+        {{ t('common.ai.acknowledgmentMessage', { provider: appStore.aiProvider }) }}
       </p>
       <v-btn color="warning" variant="flat" :to="{ name: 'settings' }">
         <v-icon start>mdi-cog</v-icon>
-        Go to Settings
+        {{ t('common.buttons.goToSettings') }}
       </v-btn>
     </v-alert>
 
@@ -41,7 +39,7 @@
           :transactions="preview.transactions.value"
           :count="preview.count.value ?? 0"
           :loading="preview.fetching.value || preview.loadingMore.value"
-          loading-text="Fetching uncategorized transactions..."
+          :loading-text="t('views.categories.loadingText')"
           @change="debouncedFetchCount"
           @load-more="loadMoreTransactions"
         />
@@ -62,16 +60,16 @@
         <EmptyState
           v-if="!loading && !hasSearched"
           icon="mdi-brain"
-          title="Ready to analyze"
-          subtitle="Click 'Get AI Suggestions' to analyze uncategorized transactions"
+          :title="t('common.messages.readyToAnalyze')"
+          :subtitle="t('views.categories.clickToAnalyze')"
         />
 
         <!-- Empty State - All categorized -->
         <EmptyState
           v-else-if="!loading && suggestions.length === 0 && hasSearched"
           icon="mdi-check-circle"
-          title="All transactions are categorized"
-          subtitle="No uncategorized transactions found in the selected date range"
+          :title="t('views.categories.allCategorized')"
+          :subtitle="t('views.categories.noUncategorizedFound')"
         />
 
         <!-- Results -->
@@ -81,14 +79,14 @@
             :stats="[
               {
                 icon: 'mdi-lightbulb',
-                label: `${classifiableSuggestions.length} suggestions`,
+                label: t('views.categories.suggestions', { count: classifiableSuggestions.length }),
                 color: 'primary',
               },
               ...(unclassifiableSuggestions.length > 0
                 ? [
                     {
                       icon: 'mdi-help-circle',
-                      label: `${unclassifiableSuggestions.length} unclassifiable`,
+                      label: t('views.categories.unclassifiable', { count: unclassifiableSuggestions.length }),
                       color: 'warning',
                     },
                   ]
@@ -98,7 +96,7 @@
             :selectable-count="classifiableSuggestions.length"
             :all-selected="selection.allSelected.value"
             :selected-count="selection.selected.value.length"
-            action-text="Apply Selected"
+            :action-text="t('common.buttons.applySelected')"
             action-color="success"
             action-icon="mdi-check-all"
             :action-loading="applying"
@@ -158,14 +156,13 @@
                   <!-- Unable to classify message -->
                   <template v-if="suggestion.unableToClassify">
                     <v-alert type="warning" variant="tonal" density="compact" class="mb-0">
-                      <strong>Unable to classify:</strong> The AI could not find a fitting category
-                      for this transaction. You may need to categorize it manually.
+                      <strong>{{ t('views.categories.unableToClassify') }}:</strong> {{ t('views.categories.aiCouldNotClassify') }}
                     </v-alert>
 
                     <v-expand-transition>
                       <div v-if="showReasoning[suggestion.transactionId]" class="mt-3">
                         <v-alert type="info" variant="tonal" density="compact">
-                          <strong>AI Reasoning:</strong> {{ suggestion.reasoning }}
+                          <strong>{{ t('views.categories.aiReasoning') }}</strong> {{ suggestion.reasoning }}
                         </v-alert>
                       </div>
                     </v-expand-transition>
@@ -176,7 +173,7 @@
                         variant="text"
                         @click="toggleReasoning(suggestion.transactionId)"
                       >
-                        {{ showReasoning[suggestion.transactionId] ? 'Hide' : 'Show' }} reasoning
+                        {{ showReasoning[suggestion.transactionId] ? t('views.categories.hideReasoning') : t('views.categories.showReasoning') }}
                       </v-btn>
                     </div>
                   </template>
@@ -198,14 +195,14 @@
                         variant="text"
                         @click="toggleReasoning(suggestion.transactionId)"
                       >
-                        {{ showReasoning[suggestion.transactionId] ? 'Hide' : 'Show' }} reasoning
+                        {{ showReasoning[suggestion.transactionId] ? t('views.categories.hideReasoning') : t('views.categories.showReasoning') }}
                       </v-btn>
                     </div>
 
                     <v-expand-transition>
                       <div v-if="showReasoning[suggestion.transactionId]" class="mt-3">
                         <v-alert type="info" variant="tonal" density="compact">
-                          <strong>AI Reasoning:</strong> {{ suggestion.reasoning }}
+                          <strong>{{ t('views.categories.aiReasoning') }}</strong> {{ suggestion.reasoning }}
                         </v-alert>
                       </div>
                     </v-expand-transition>
@@ -222,8 +219,8 @@
         <FinalActionButton
           v-if="currentStep === 2"
           :has-run="hasSearched"
-          text="Get AI Suggestions"
-          rerun-text="Re-analyze"
+          :text="t('common.buttons.getAISuggestions')"
+          :rerun-text="t('common.buttons.reanalyze')"
           icon="mdi-brain"
           rerun-icon="mdi-refresh"
           :loading="loading"
@@ -236,6 +233,7 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 import api from '../services/api';
 import type { CategorySuggestion, TransactionUpdate } from '@shared/types/app';
 import {
@@ -260,6 +258,9 @@ import {
 import { formatCurrency, formatDate, CategorySuggestionSchema } from '../utils';
 import { useAppStore } from '../stores/app';
 
+// i18n
+const { t } = useI18n();
+
 // App store for AI acknowledgment check
 const appStore = useAppStore();
 
@@ -268,10 +269,10 @@ const { showSnackbar } = useSnackbar();
 
 // Wizard state
 const currentStep = ref(1);
-const wizardSteps = [
-  { title: 'Date Range', subtitle: 'Select transactions to analyze' },
-  { title: 'Review & Apply', subtitle: 'Review and apply AI suggestions' },
-];
+const wizardSteps = computed(() => [
+  { title: t('common.steps.dateRange'), subtitle: t('common.steps.selectTransactionsToAnalyze') },
+  { title: t('common.steps.reviewApply'), subtitle: t('views.categories.steps.reviewApply.subtitle') },
+]);
 
 // Step 1: Date range state
 const startDate = ref<string>();
@@ -325,18 +326,18 @@ const stepLoading = computed(() => {
 const nextButtonText = computed(() => {
   switch (currentStep.value) {
     case 1:
-      return 'Get AI Suggestions';
+      return t('common.buttons.getAISuggestions');
     default:
-      return 'Next';
+      return t('common.buttons.next');
   }
 });
 
 const statusMessage = computed(() => {
   if (currentStep.value === 1) {
-    if (preview.fetching.value) return 'Fetching...';
+    if (preview.fetching.value) return t('common.messages.fetching');
     if (preview.count.value === null) return '';
-    if (preview.count.value === 0) return 'No uncategorized transactions';
-    return `${preview.count.value} uncategorized`;
+    if (preview.count.value === 0) return t('views.categories.noUncategorized');
+    return t('views.categories.uncategorized', { count: preview.count.value });
   }
   return '';
 });
@@ -411,7 +412,10 @@ function handleStreamEvent(
         progressData.current || 0,
         progressData.total || 0,
         progressData.message ||
-          `Analyzing transaction ${progressData.current} of ${progressData.total}...`
+          t('common.messages.analyzingTransaction', {
+            current: progressData.current,
+            total: progressData.total,
+          })
       );
       break;
     }
@@ -428,7 +432,7 @@ function handleStreamEvent(
     }
     case 'error': {
       const errorData = event.data as { error: string };
-      showSnackbar(errorData?.error || 'An error occurred', 'error');
+      showSnackbar(errorData?.error || t('common.errors.anErrorOccurred'), 'error');
       break;
     }
     case 'complete':
@@ -441,7 +445,7 @@ function handleStreamEvent(
 async function getSuggestions() {
   // Check if AI acknowledgment is required before proceeding
   if (appStore.requiresAIAcknowledgment) {
-    showSnackbar('Please acknowledge AI data sharing in Settings first', 'warning');
+    showSnackbar(t('common.messages.acknowledgeAIFirst'), 'warning');
     return;
   }
 
@@ -451,7 +455,7 @@ async function getSuggestions() {
   selection.clear();
   progress.reset();
   validationErrorCount.value = 0;
-  progress.message.value = 'Connecting to AI...';
+  progress.message.value = t('common.messages.connectingToAI');
 
   try {
     await processStream(
@@ -467,14 +471,14 @@ async function getSuggestions() {
 
     if (validationErrorCount.value > 0) {
       showSnackbar(
-        `${validationErrorCount.value} item(s) skipped due to data errors. Check console for details.`,
+        t('common.messages.itemsSkipped', { count: validationErrorCount.value }),
         'warning'
       );
     } else if (suggestions.value.length > 0) {
-      showSnackbar(`Generated ${suggestions.value.length} category suggestions`, 'info');
+      showSnackbar(t('views.categories.generatedSuggestions', { count: suggestions.value.length }), 'info');
     }
   } catch (error) {
-    showSnackbar(error instanceof Error ? error.message : 'Failed to get suggestions', 'error');
+    showSnackbar(error instanceof Error ? error.message : t('common.errors.failedToGetSuggestions'), 'error');
   } finally {
     loading.value = false;
   }
@@ -522,7 +526,7 @@ async function applySelected() {
     const result = response.data.data;
 
     showSnackbar(
-      `Applied ${result.successful.length} categories${result.failed.length > 0 ? `, ${result.failed.length} failed` : ''}`,
+      t('views.categories.appliedCategories', { successful: result.successful.length, failed: result.failed.length }),
       result.failed.length > 0 ? 'warning' : 'success'
     );
 
@@ -531,7 +535,7 @@ async function applySelected() {
     );
     selection.clear();
   } catch (error) {
-    showSnackbar(error instanceof Error ? error.message : 'Failed to apply categories', 'error');
+    showSnackbar(error instanceof Error ? error.message : t('views.categories.failedToApplyCategories'), 'error');
   } finally {
     applying.value = false;
   }

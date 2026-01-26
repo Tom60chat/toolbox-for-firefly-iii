@@ -3,7 +3,7 @@
     <v-card rounded="lg">
       <v-card-title class="d-flex align-center">
         <v-icon :color="blockInfo.color" class="mr-2">{{ blockInfo.icon }}</v-icon>
-        {{ isEditing ? 'Edit' : 'Add' }} {{ blockInfo.label }} Block
+        {{ isEditing ? t('components.converter.editBlock') : t('components.converter.addBlock') }} {{ blockInfo.label }} {{ t('components.converter.block') }}
       </v-card-title>
 
       <v-card-text>
@@ -12,9 +12,9 @@
           <v-select
             v-model="(localBlock as ColumnBlock).sourceColumn"
             :items="sourceColumns"
-            label="Source Column"
+            :label="t('components.converter.sourceColumn')"
             variant="outlined"
-            hint="Select a column from your CSV file"
+            :hint="t('components.converter.sourceColumnHint')"
             persistent-hint
           />
         </template>
@@ -23,9 +23,9 @@
         <template v-else-if="localBlock.type === 'static'">
           <v-text-field
             v-model="(localBlock as StaticBlock).value"
-            label="Static Value"
+            :label="t('components.converter.staticValue')"
             variant="outlined"
-            hint="Enter a fixed value for this column"
+            :hint="t('components.converter.staticValueHint')"
             persistent-hint
           />
         </template>
@@ -34,17 +34,17 @@
         <template v-else-if="localBlock.type === 'truncate'">
           <v-text-field
             v-model.number="(localBlock as TruncateBlock).maxLength"
-            label="Max Length"
+            :label="t('components.converter.maxLength')"
             type="number"
             min="1"
             variant="outlined"
-            hint="Maximum number of characters"
+            :hint="t('components.converter.maxLengthHint')"
             persistent-hint
             class="mb-4"
           />
           <v-checkbox
             v-model="(localBlock as TruncateBlock).ellipsis"
-            label="Add ellipsis (...) when truncated"
+            :label="t('components.converter.addEllipsis')"
             hide-details
           />
         </template>
@@ -53,22 +53,21 @@
         <template v-else-if="localBlock.type === 'dateFormat'">
           <v-text-field
             v-model="(localBlock as DateFormatBlock).inputFormat"
-            label="Input Format"
+            :label="t('components.converter.inputFormat')"
             variant="outlined"
-            hint="Format of the date in your CSV (e.g., DD.MM.YYYY, MM/DD/YYYY)"
+            :hint="t('components.converter.inputFormatHint')"
             persistent-hint
             class="mb-4"
           />
           <v-text-field
             v-model="(localBlock as DateFormatBlock).outputFormat"
-            label="Output Format"
+            :label="t('components.converter.outputFormat')"
             variant="outlined"
-            hint="Format for Firefly (usually YYYY-MM-DD)"
+            :hint="t('components.converter.outputFormatHint')"
             persistent-hint
           />
           <v-alert type="info" variant="tonal" density="compact" class="mt-4">
-            <strong>Format tokens:</strong> YYYY (year), MM (month), DD (day), HH (hour), mm
-            (minute), ss (second)
+            <strong>{{ t('components.converter.formatTokens') }}:</strong> {{ t('components.converter.formatTokensDesc') }}
           </v-alert>
         </template>
 
@@ -76,14 +75,14 @@
         <template v-else-if="localBlock.type === 'numberFormat'">
           <v-row>
             <v-col cols="12" md="6">
-              <div class="text-subtitle-2 mb-2">Input Format</div>
+              <div class="text-subtitle-2 mb-2">{{ t('components.converter.inputFormat') }}</div>
               <v-select
                 v-model="(localBlock as NumberFormatBlock).inputDecimalSeparator"
                 :items="[
-                  { title: 'Period (.)', value: '.' },
-                  { title: 'Comma (,)', value: ',' },
+                  { title: t('components.converter.periodSeparator'), value: '.' },
+                  { title: t('common.csvOptions.comma'), value: ',' },
                 ]"
-                label="Decimal Separator"
+                :label="t('components.converter.decimalSeparator')"
                 variant="outlined"
                 density="compact"
                 class="mb-2"
@@ -91,25 +90,25 @@
               <v-select
                 v-model="(localBlock as NumberFormatBlock).inputThousandsSeparator"
                 :items="[
-                  { title: 'None', value: '' },
-                  { title: 'Period (.)', value: '.' },
-                  { title: 'Comma (,)', value: ',' },
-                  { title: 'Space', value: ' ' },
+                  { title: t('common.labels.none'), value: '' },
+                  { title: t('components.converter.periodSeparator'), value: '.' },
+                  { title: t('common.csvOptions.comma'), value: ',' },
+                  { title: t('components.converter.space'), value: ' ' },
                 ]"
-                label="Thousands Separator"
+                :label="t('components.converter.thousandsSeparator')"
                 variant="outlined"
                 density="compact"
               />
             </v-col>
             <v-col cols="12" md="6">
-              <div class="text-subtitle-2 mb-2">Output Format</div>
+              <div class="text-subtitle-2 mb-2">{{ t('components.converter.outputFormat') }}</div>
               <v-select
                 v-model="(localBlock as NumberFormatBlock).outputDecimalSeparator"
                 :items="[
-                  { title: 'Period (.)', value: '.' },
-                  { title: 'Comma (,)', value: ',' },
+                  { title: t('components.converter.periodSeparator'), value: '.' },
+                  { title: t('common.csvOptions.comma'), value: ',' },
                 ]"
-                label="Decimal Separator"
+                :label="t('components.converter.decimalSeparator')"
                 variant="outlined"
                 density="compact"
                 class="mb-2"
@@ -117,12 +116,12 @@
               <v-select
                 v-model="(localBlock as NumberFormatBlock).outputThousandsSeparator"
                 :items="[
-                  { title: 'None', value: '' },
-                  { title: 'Period (.)', value: '.' },
-                  { title: 'Comma (,)', value: ',' },
-                  { title: 'Space', value: ' ' },
+                  { title: t('common.labels.none'), value: '' },
+                  { title: t('components.converter.periodSeparator'), value: '.' },
+                  { title: t('common.csvOptions.comma'), value: ',' },
+                  { title: t('components.converter.space'), value: ' ' },
                 ]"
-                label="Thousands Separator"
+                :label="t('components.converter.thousandsSeparator')"
                 variant="outlined"
                 density="compact"
               />
@@ -132,7 +131,7 @@
             <v-col cols="12" md="6">
               <v-text-field
                 v-model.number="(localBlock as NumberFormatBlock).decimals"
-                label="Decimal Places"
+                :label="t('components.converter.decimalPlaces')"
                 type="number"
                 min="0"
                 max="10"
@@ -143,7 +142,7 @@
             <v-col cols="12" md="6" class="d-flex align-center">
               <v-checkbox
                 v-model="(localBlock as NumberFormatBlock).absolute"
-                label="Absolute value (remove negative)"
+                :label="t('components.converter.absoluteValue')"
                 hide-details
                 density="compact"
               />
@@ -155,8 +154,8 @@
         <template v-else-if="localBlock.type === 'conditional'">
           <v-checkbox
             v-model="(localBlock as ConditionalBlock).condition.useCurrentValue"
-            label="Match against current value (instead of source column)"
-            hint="Use this to apply conditions based on the result of previous transformations"
+            :label="t('components.converter.matchCurrentValue')"
+            :hint="t('components.converter.matchCurrentValueHint')"
             persistent-hint
             class="mb-4"
           />
@@ -165,7 +164,7 @@
               <v-select
                 v-model="(localBlock as ConditionalBlock).condition.column"
                 :items="sourceColumns"
-                label="Source Column"
+                :label="t('components.converter.sourceColumn')"
                 variant="outlined"
                 :disabled="(localBlock as ConditionalBlock).condition.useCurrentValue"
               />
@@ -174,14 +173,14 @@
               <v-select
                 v-model="(localBlock as ConditionalBlock).condition.operator"
                 :items="conditionOperators"
-                label="Operator"
+                :label="t('components.converter.operator')"
                 variant="outlined"
               />
             </v-col>
             <v-col cols="12" sm="4">
               <v-text-field
                 v-model="(localBlock as ConditionalBlock).condition.value"
-                label="Value"
+                :label="t('common.labels.value')"
                 variant="outlined"
                 :disabled="
                   ['isEmpty', 'isNotEmpty'].includes(
@@ -195,19 +194,19 @@
           <v-row class="mt-2">
             <v-col cols="12" md="6">
               <NestedBlocksEditor
-                label="Then (condition is true)"
+                :label="t('components.converter.thenLabel')"
                 :blocks="(localBlock as ConditionalBlock).thenBlocks"
                 :source-columns="sourceColumns"
-                empty-text="No blocks. Value unchanged when true."
+                :empty-text="t('components.converter.thenEmptyText')"
                 @update:blocks="(localBlock as ConditionalBlock).thenBlocks = $event"
               />
             </v-col>
             <v-col cols="12" md="6">
               <NestedBlocksEditor
-                label="Else (condition is false)"
+                :label="t('components.converter.elseLabel')"
                 :blocks="(localBlock as ConditionalBlock).elseBlocks"
                 :source-columns="sourceColumns"
-                empty-text="No blocks. Value unchanged when false."
+                :empty-text="t('components.converter.elseEmptyText')"
                 @update:blocks="(localBlock as ConditionalBlock).elseBlocks = $event"
               />
             </v-col>
@@ -218,23 +217,23 @@
         <template v-else-if="localBlock.type === 'switchCase'">
           <v-checkbox
             v-model="(localBlock as SwitchCaseBlock).useCurrentValue"
-            label="Match against current value (instead of source column)"
-            hint="Use this to apply conditions based on the result of previous transformations"
+            :label="t('components.converter.matchCurrentValue')"
+            :hint="t('components.converter.matchCurrentValueHint')"
             persistent-hint
             class="mb-4"
           />
           <v-select
             v-model="(localBlock as SwitchCaseBlock).column"
             :items="sourceColumns"
-            label="Source Column"
+            :label="t('components.converter.sourceColumn')"
             variant="outlined"
-            hint="Column to evaluate for each case"
+            :hint="t('components.converter.caseColumnHint')"
             persistent-hint
             class="mb-4"
             :disabled="(localBlock as SwitchCaseBlock).useCurrentValue"
           />
 
-          <div class="text-subtitle-2 mb-2">Cases</div>
+          <div class="text-subtitle-2 mb-2">{{ t('components.converter.cases') }}</div>
           <v-expansion-panels variant="accordion" class="mb-4">
             <v-expansion-panel
               v-for="(caseItem, index) in (localBlock as SwitchCaseBlock).cases"
@@ -242,10 +241,10 @@
             >
               <v-expansion-panel-title>
                 <div class="d-flex align-center ga-2 flex-grow-1">
-                  <v-chip size="x-small" color="primary">Case {{ index + 1 }}</v-chip>
+                  <v-chip size="x-small" color="primary">{{ t('components.converter.case') }} {{ index + 1 }}</v-chip>
                   <span class="text-body-2"> {{ caseItem.operator }} "{{ caseItem.value }}" </span>
                   <v-chip size="x-small" class="ml-auto mr-2">
-                    {{ caseItem.blocks.length }} block{{ caseItem.blocks.length !== 1 ? 's' : '' }}
+                    {{ t('components.converter.blocksCount', { count: caseItem.blocks.length }) }}
                   </v-chip>
                 </div>
               </v-expansion-panel-title>
@@ -255,7 +254,7 @@
                     <v-select
                       v-model="caseItem.operator"
                       :items="conditionOperators"
-                      label="Operator"
+                      :label="t('components.converter.operator')"
                       variant="outlined"
                       density="compact"
                     />
@@ -263,7 +262,7 @@
                   <v-col cols="12" sm="5">
                     <v-text-field
                       v-model="caseItem.value"
-                      label="Value"
+                      :label="t('common.labels.value')"
                       variant="outlined"
                       density="compact"
                       :disabled="['isEmpty', 'isNotEmpty'].includes(caseItem.operator)"
@@ -278,15 +277,15 @@
                       @click="removeSwitchCase(index)"
                     >
                       <v-icon>mdi-delete</v-icon>
-                      Delete
+                      {{ t('common.buttons.delete') }}
                     </v-btn>
                   </v-col>
                 </v-row>
                 <NestedBlocksEditor
-                  label="Output Blocks"
+                  :label="t('components.converter.outputBlocks')"
                   :blocks="caseItem.blocks"
                   :source-columns="sourceColumns"
-                  empty-text="No blocks. Value unchanged for this case."
+                  :empty-text="t('components.converter.caseEmptyText')"
                   @update:blocks="caseItem.blocks = $event"
                 />
               </v-expansion-panel-text>
@@ -300,14 +299,14 @@
             class="mb-4"
             @click="addSwitchCase"
           >
-            Add Case
+            {{ t('components.converter.addCase') }}
           </v-btn>
 
           <NestedBlocksEditor
-            label="Default (no case matches)"
+            :label="t('components.converter.defaultLabel')"
             :blocks="(localBlock as SwitchCaseBlock).defaultBlocks"
             :source-columns="sourceColumns"
-            empty-text="No blocks. Value unchanged when no case matches."
+            :empty-text="t('components.converter.defaultEmptyText')"
             @update:blocks="(localBlock as SwitchCaseBlock).defaultBlocks = $event"
           />
         </template>
@@ -315,14 +314,14 @@
         <!-- Remove Row Block -->
         <template v-else-if="localBlock.type === 'removeRow'">
           <v-alert type="warning" variant="tonal" density="compact" class="mb-4">
-            Rows matching this condition will be excluded from the output.
+            {{ t('components.converter.removeRowWarning') }}
           </v-alert>
           <v-row>
             <v-col cols="12" sm="4">
               <v-select
                 v-model="(localBlock as RemoveRowBlock).condition.column"
                 :items="sourceColumns"
-                label="Column"
+                :label="t('components.converter.column')"
                 variant="outlined"
               />
             </v-col>
@@ -330,14 +329,14 @@
               <v-select
                 v-model="(localBlock as RemoveRowBlock).condition.operator"
                 :items="conditionOperators"
-                label="Operator"
+                :label="t('components.converter.operator')"
                 variant="outlined"
               />
             </v-col>
             <v-col cols="12" sm="4">
               <v-text-field
                 v-model="(localBlock as RemoveRowBlock).condition.value"
-                label="Value"
+                :label="t('common.labels.value')"
                 variant="outlined"
                 :disabled="
                   ['isEmpty', 'isNotEmpty'].includes(
@@ -353,9 +352,9 @@
         <template v-else-if="localBlock.type === 'prefix'">
           <v-text-field
             v-model="(localBlock as PrefixBlock).prefix"
-            label="Prefix"
+            :label="t('components.converter.prefix')"
             variant="outlined"
-            hint="Text to add before the value"
+            :hint="t('components.converter.prefixHint')"
             persistent-hint
           />
         </template>
@@ -364,9 +363,9 @@
         <template v-else-if="localBlock.type === 'suffix'">
           <v-text-field
             v-model="(localBlock as SuffixBlock).suffix"
-            label="Suffix"
+            :label="t('components.converter.suffix')"
             variant="outlined"
-            hint="Text to add after the value"
+            :hint="t('components.converter.suffixHint')"
             persistent-hint
           />
         </template>
@@ -375,29 +374,29 @@
         <template v-else-if="localBlock.type === 'replace'">
           <v-text-field
             v-model="(localBlock as ReplaceBlock).find"
-            label="Find"
+            :label="t('components.converter.find')"
             variant="outlined"
-            hint="Text to search for"
+            :hint="t('components.converter.findHint')"
             persistent-hint
             class="mb-4"
           />
           <v-text-field
             v-model="(localBlock as ReplaceBlock).replace"
-            label="Replace With"
+            :label="t('components.converter.replaceWith')"
             variant="outlined"
-            hint="Replacement text"
+            :hint="t('components.converter.replaceHint')"
             persistent-hint
             class="mb-4"
           />
           <v-checkbox
             v-model="(localBlock as ReplaceBlock).useRegex"
-            label="Use Regular Expression"
+            :label="t('components.converter.useRegex')"
             hide-details
             class="mb-2"
           />
           <v-checkbox
             v-model="(localBlock as ReplaceBlock).caseInsensitive"
-            label="Case Insensitive"
+            :label="t('components.converter.caseInsensitive')"
             hide-details
           />
         </template>
@@ -405,15 +404,15 @@
         <!-- Custom Script Block -->
         <template v-else-if="localBlock.type === 'customScript'">
           <v-alert type="warning" variant="tonal" density="compact" class="mb-4">
-            <strong>Warning:</strong> Custom scripts run in the browser. Use with caution.
+            <strong>{{ t('common.labels.warning') }}:</strong> {{ t('components.converter.customScriptWarning') }}
           </v-alert>
           <v-textarea
             v-model="(localBlock as CustomScriptBlock).script"
-            label="JavaScript Code"
+            :label="t('components.converter.javaScriptCode')"
             variant="outlined"
             rows="8"
             font="monospace"
-            hint="Variables: value (current value), row (array of all columns), columns (header names)"
+            :hint="t('components.converter.scriptHint')"
             persistent-hint
           />
         </template>
@@ -421,8 +420,8 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="text" @click="onCancel">Cancel</v-btn>
-        <v-btn color="primary" @click="onSave">{{ isEditing ? 'Save' : 'Add' }}</v-btn>
+        <v-btn variant="text" @click="onCancel">{{ t('common.buttons.cancel') }}</v-btn>
+        <v-btn color="primary" @click="onSave">{{ isEditing ? t('common.buttons.save') : t('common.buttons.add') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -430,6 +429,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type {
   TransformBlock,
   TransformBlockType,
@@ -465,6 +465,8 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean];
   save: [block: TransformBlock];
 }>();
+
+const { t } = useI18n();
 
 const dialogOpen = computed({
   get: () => props.modelValue,
@@ -505,17 +507,17 @@ const blockInfo = computed<BlockTypeInfo>(() => {
   return BLOCK_TYPES.find((b) => b.type === localBlock.value.type) || BLOCK_TYPES[0];
 });
 
-const conditionOperators = [
-  { title: 'Equals', value: 'equals' },
-  { title: 'Contains', value: 'contains' },
-  { title: 'Starts With', value: 'startsWith' },
-  { title: 'Ends With', value: 'endsWith' },
-  { title: 'Greater Than', value: 'greaterThan' },
-  { title: 'Less Than', value: 'lessThan' },
-  { title: 'Is Empty', value: 'isEmpty' },
-  { title: 'Is Not Empty', value: 'isNotEmpty' },
-  { title: 'Matches Regex', value: 'matches' },
-];
+const conditionOperators = computed(() => [
+  { title: t('components.converter.operatorEquals'), value: 'equals' },
+  { title: t('components.converter.operatorContains'), value: 'contains' },
+  { title: t('components.converter.operatorStartsWith'), value: 'startsWith' },
+  { title: t('components.converter.operatorEndsWith'), value: 'endsWith' },
+  { title: t('components.converter.operatorGreaterThan'), value: 'greaterThan' },
+  { title: t('components.converter.operatorLessThan'), value: 'lessThan' },
+  { title: t('components.converter.operatorIsEmpty'), value: 'isEmpty' },
+  { title: t('components.converter.operatorIsNotEmpty'), value: 'isNotEmpty' },
+  { title: t('components.converter.operatorMatches'), value: 'matches' },
+]);
 
 function onSave() {
   emit('save', JSON.parse(JSON.stringify(localBlock.value)));

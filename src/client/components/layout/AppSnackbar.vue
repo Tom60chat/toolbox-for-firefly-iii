@@ -11,13 +11,15 @@
     </div>
 
     <template #actions>
-      <v-btn variant="text" @click="snackbarStore.hide()"> Close </v-btn>
+      <v-btn variant="text" @click="snackbarStore.hide()">{{ t('common.buttons.close') }}</v-btn>
     </template>
   </v-snackbar>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import { useSnackbarStore } from '../../stores/snackbar';
 
+const { t } = useI18n();
 const snackbarStore = useSnackbarStore();
 </script>

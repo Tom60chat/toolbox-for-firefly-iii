@@ -1,8 +1,14 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import api from '../services/api';
 import type { ToolStatus } from '@shared/types/app';
 import { themes, defaultThemeId, getThemeById, getVuetifyThemeName } from '../config/themes';
+import {
+  setLocale as setI18nLocale,
+  getLocale,
+  SUPPORTED_LOCALES,
+  type SupportedLocale,
+} from '../plugins/i18n';
 
 interface AppStatus {
   configured: boolean;
@@ -28,6 +34,14 @@ export const useAppStore = defineStore(
     // Theme state (persisted)
     const themeId = ref(defaultThemeId);
     const darkMode = ref(true);
+
+    // Locale state (persisted)
+    const locale = ref<SupportedLocale>(getLocale());
+
+    // Watch locale changes and sync with i18n
+    watch(locale, (newLocale) => {
+      setI18nLocale(newLocale);
+    });
 
     // Navigation state (persisted)
     const navigationDrawer = ref(true);
@@ -65,6 +79,9 @@ export const useAppStore = defineStore(
     );
     const availableThemes = computed(() => themes);
     const vuetifyThemeName = computed(() => getVuetifyThemeName(themeId.value, darkMode.value));
+
+    // Locale getters
+    const supportedLocales = computed(() => SUPPORTED_LOCALES);
 
     // Actions
     async function fetchStatus() {
@@ -117,6 +134,12 @@ export const useAppStore = defineStore(
       darkMode.value = value;
     }
 
+    function setLocale(newLocale: SupportedLocale) {
+      if (SUPPORTED_LOCALES.includes(newLocale)) {
+        locale.value = newLocale;
+      }
+    }
+
     function toggleNavigationDrawer() {
       navigationDrawer.value = !navigationDrawer.value;
     }
@@ -145,6 +168,7 @@ export const useAppStore = defineStore(
       error,
       themeId,
       darkMode,
+      locale,
       navigationDrawer,
       navigationRail,
       aiDataSharingAcknowledged,
@@ -163,6 +187,7 @@ export const useAppStore = defineStore(
       currentTheme,
       availableThemes,
       vuetifyThemeName,
+      supportedLocales,
 
       // Actions
       fetchStatus,
@@ -170,6 +195,7 @@ export const useAppStore = defineStore(
       setTheme,
       toggleDarkMode,
       setDarkMode,
+      setLocale,
       toggleNavigationDrawer,
       toggleNavigationRail,
       closeNavigationDrawer,
@@ -183,6 +209,7 @@ export const useAppStore = defineStore(
       pick: [
         'themeId',
         'darkMode',
+        'locale',
         'navigationDrawer',
         'navigationRail',
         'aiDataSharingAcknowledged',

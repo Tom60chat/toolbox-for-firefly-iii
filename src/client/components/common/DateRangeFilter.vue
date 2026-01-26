@@ -3,7 +3,7 @@
     <v-col cols="12" sm="6" md="3">
       <v-text-field
         v-model="localStartDate"
-        label="Start Date"
+        :label="t('common.labels.startDate')"
         type="date"
         prepend-inner-icon="mdi-calendar"
         clearable
@@ -16,7 +16,7 @@
     <v-col cols="12" sm="6" md="3">
       <v-text-field
         v-model="localEndDate"
-        label="End Date"
+        :label="t('common.labels.endDate')"
         type="date"
         prepend-inner-icon="mdi-calendar"
         clearable
@@ -43,6 +43,9 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 type RelativePreset = 'week' | 'month' | 'quarter' | 'year';
 type YearPreset = 'thisYear' | 'lastYear' | 'twoYearsAgo';
@@ -73,10 +76,10 @@ const currentYear = new Date().getFullYear();
 const relativePresets = computed(() => props.presets);
 
 const presetLabels: Record<RelativePreset, string> = {
-  week: 'Week',
-  month: 'Month',
-  quarter: 'Quarter',
-  year: 'Year',
+  week: t('components.dateRangeFilter.presets.week'),
+  month: t('components.dateRangeFilter.presets.month'),
+  quarter: t('components.dateRangeFilter.presets.quarter'),
+  year: t('components.dateRangeFilter.presets.year'),
 };
 
 watch(
