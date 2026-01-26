@@ -19,7 +19,7 @@
       :count="count"
       :loading="loading"
       :loading-more="loadingMore"
-      :loading-text="loadingText"
+      :loading-text="resolvedLoadingText"
       class="mt-4"
       @load-more="$emit('load-more')"
     />
@@ -28,9 +28,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import DateRangeFilter from './DateRangeFilter.vue';
 import TransactionPreview from './TransactionPreview.vue';
 import type { FireflyTransactionSplit } from '@shared/types/firefly';
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -48,7 +51,7 @@ const props = withDefaults(
     endDate: undefined,
     loading: false,
     loadingMore: false,
-    loadingText: 'Fetching transactions...',
+    loadingText: undefined,
     presets: () => ['week', 'month', 'quarter'],
   }
 );
@@ -59,6 +62,10 @@ const emit = defineEmits<{
   change: [];
   'load-more': [];
 }>();
+
+const resolvedLoadingText = computed(
+  () => props.loadingText ?? t('common.status.fetchingTransactions')
+);
 
 const startDateModel = computed({
   get: () => props.startDate,

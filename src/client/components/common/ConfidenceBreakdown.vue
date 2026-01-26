@@ -6,7 +6,7 @@
       </span>
     </template>
     <v-card class="confidence-breakdown-card" rounded="lg" elevation="0" border="0">
-      <v-card-title class="text-subtitle-2 pb-1"> Confidence Breakdown </v-card-title>
+      <v-card-title class="text-subtitle-2 pb-1">{{ t('common.labels.confidenceBreakdown') }}</v-card-title>
       <v-card-text class="pt-0">
         <div
           v-for="item in items"
@@ -22,7 +22,7 @@
         </div>
         <v-divider class="my-2" />
         <div class="breakdown-row d-flex justify-space-between font-weight-bold">
-          <span>Total</span>
+          <span>{{ t('common.labels.total') }}</span>
           <span class="ml-4 text-right breakdown-value">
             {{ formatValue(itemsTotal) }}
             <template v-if="itemsMaxTotal !== undefined">/ {{ formatMax(itemsMaxTotal) }}</template>
@@ -35,7 +35,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import ConfidenceChip from './ConfidenceChip.vue';
+
+const { t } = useI18n();
 
 export interface BreakdownItem {
   /** Label for this breakdown item */

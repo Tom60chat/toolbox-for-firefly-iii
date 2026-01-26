@@ -16,13 +16,13 @@
             :disabled="currentStep === 1 || disabled"
             @click="reset"
           >
-            Start Over
+            {{ t('common.buttons.startOver') }}
           </v-btn>
 
           <div class="d-flex align-center ga-3">
             <div class="d-flex align-center ga-2">
               <span class="text-body-2 text-medium-emphasis">
-                Step {{ currentStep }} of {{ totalSteps }}
+                {{ t('components.wizardStepper.stepXOfY', { current: currentStep, total: totalSteps }) }}
               </span>
               <template v-if="statusMessage">
                 <span class="text-medium-emphasis">•</span>
@@ -40,7 +40,7 @@
                 :disabled="disabled"
                 @click="previousStep"
               >
-                Back
+                {{ t('common.buttons.back') }}
               </v-btn>
 
               <v-btn
@@ -51,7 +51,7 @@
                 :loading="loading"
                 @click="nextStep"
               >
-                {{ nextButtonText }}
+                {{ nextButtonText || t('common.buttons.next') }}
               </v-btn>
 
               <slot name="final-action" />
@@ -65,6 +65,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 interface StepItem {
   title: string;
@@ -86,7 +89,7 @@ const props = withDefaults(defineProps<Props>(), {
   canProceed: true,
   loading: false,
   disabled: false,
-  nextButtonText: 'Next',
+  nextButtonText: undefined,
   statusMessage: '',
   statusColor: '',
 });

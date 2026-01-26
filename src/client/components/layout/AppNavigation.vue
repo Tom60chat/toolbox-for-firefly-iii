@@ -11,7 +11,7 @@
           <v-img :src="logoSrc" alt="Logo" width="32" height="32" class="mr-7" />
         </template>
         <v-list-item-title class="text-subtitle-1 font-weight-bold text-no-wrap">
-          FireflyIII Toolbox
+          {{ t('app.title') }}
         </v-list-item-title>
       </v-list-item>
     </div>
@@ -32,7 +32,7 @@
         @click="mobile && appStore.closeNavigationDrawer()"
       >
         <template v-if="item.requiresAI && !appStore.hasAI" #append>
-          <v-tooltip text="Requires AI configuration (OpenAI or Ollama)">
+          <v-tooltip :text="t('common.labels.requiresAI')">
             <template #activator="{ props }">
               <v-icon v-bind="props" size="small" color="warning">mdi-alert</v-icon>
             </template>
@@ -47,7 +47,7 @@
         <v-list-item
           to="/settings"
           prepend-icon="mdi-cog"
-          title="Settings"
+          :title="t('navigation.settings')"
           rounded="lg"
           @click="mobile && appStore.closeNavigationDrawer()"
         />
@@ -59,9 +59,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useDisplay } from 'vuetify';
+import { useI18n } from 'vue-i18n';
 import { useAppStore } from '../../stores/app';
 import { useTools } from '../../composables';
 
+const { t } = useI18n();
 const appStore = useAppStore();
 const { tools } = useTools();
 const { mobile } = useDisplay();
@@ -70,16 +72,16 @@ const logoSrc = computed(() => (appStore.darkMode ? '/logo.png' : '/logo_light_m
 
 const navigationItems = computed(() => [
   {
-    title: 'Dashboard',
-    subtitle: 'Overview',
+    title: t('navigation.dashboard'),
+    subtitle: t('navigation.overview'),
     icon: 'mdi-view-dashboard',
     route: '/',
     disabled: false,
     requiresAI: false,
   },
   ...tools.value.map((tool) => ({
-    title: tool.title,
-    subtitle: tool.subtitle,
+    title: t(tool.title),
+    subtitle: t(tool.subtitle),
     icon: tool.icon,
     route: tool.route,
     disabled: tool.disabled,

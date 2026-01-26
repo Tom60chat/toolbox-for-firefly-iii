@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'src/**'
+      - 'scripts/**'
       - 'package.json'
       - 'package-lock.json'
       - 'tsconfig*.json'
@@ -15,6 +16,7 @@ on:
     branches: [main]
     paths:
       - 'src/**'
+      - 'scripts/**'
       - 'package.json'
       - 'package-lock.json'
       - 'tsconfig*.json'
@@ -83,3 +85,22 @@ jobs:
 
       - name: Run tests
         run: npm run test
+
+  i18n:
+    name: i18n Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check i18n keys
+        run: npm run i18n:check:json

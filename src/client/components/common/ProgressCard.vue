@@ -4,7 +4,7 @@
       <div class="d-flex align-center justify-space-between mb-2">
         <span class="text-body-2">
           <v-icon v-if="icon" class="mr-1" size="small">{{ icon }}</v-icon>
-          {{ message }}
+          {{ message || t('common.messages.processing') }}
         </span>
         <span class="text-body-2 text-medium-emphasis"> {{ current }} / {{ total }} </span>
       </div>
@@ -15,6 +15,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -27,7 +30,7 @@ const props = withDefaults(
   }>(),
   {
     show: true,
-    message: 'Processing...',
+    message: undefined,
     icon: undefined,
     color: 'primary',
   }

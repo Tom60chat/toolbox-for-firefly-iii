@@ -5,12 +5,12 @@
       <div class="hero-content">
         <div class="d-flex align-center">
           <div class="hero-icon mr-4">
-            <v-img src="/logo.png" alt="FireflyIII Toolbox" width="56" height="56" />
+            <v-img src="/logo.png" :alt="t('app.title')" width="56" height="56" />
           </div>
           <div>
-            <h1 class="text-h4 text-md-h3 font-weight-bold text-white">FireflyIII Toolbox</h1>
+            <h1 class="text-h4 text-md-h3 font-weight-bold text-white">{{ t('app.title') }}</h1>
             <p class="text-subtitle-1 text-white-secondary mt-1">
-              Enhance your financial management with powerful automation tools
+              {{ t('views.home.subtitle') }}
             </p>
           </div>
         </div>
@@ -25,9 +25,9 @@
             {{ appStore.isConnected ? 'mdi-check-circle' : 'mdi-close-circle' }}
           </v-icon>
           <div class="flex-grow-1">
-            <div class="text-caption text-uppercase font-weight-medium">FireflyIII</div>
+            <div class="text-caption text-uppercase font-weight-medium">{{ t('settings.firefly') }}</div>
             <div class="text-body-1 font-weight-bold">
-              {{ appStore.isConnected ? 'Connected' : 'Disconnected' }}
+              {{ appStore.isConnected ? t('common.status.connected') : t('common.status.disconnected') }}
             </div>
           </div>
           <v-btn
@@ -37,7 +37,7 @@
             color="error"
             to="/settings"
           >
-            Show Why
+            {{ t('common.buttons.showWhy') }}
           </v-btn>
         </v-card-text>
       </v-card>
@@ -48,9 +48,9 @@
             {{ appStore.hasAI ? 'mdi-robot' : 'mdi-robot-off' }}
           </v-icon>
           <div>
-            <div class="text-caption text-uppercase font-weight-medium">AI Features</div>
+            <div class="text-caption text-uppercase font-weight-medium">{{ t('settings.aiFeatures') }}</div>
             <div class="text-body-1 font-weight-bold">
-              {{ appStore.hasAI ? 'Available' : 'Not Configured' }}
+              {{ appStore.hasAI ? t('common.status.available') : t('common.status.notConfigured') }}
             </div>
           </div>
         </v-card-text>
@@ -60,7 +60,7 @@
         <v-card-text class="d-flex align-center pa-4">
           <v-icon size="32" class="mr-3">mdi-tools</v-icon>
           <div>
-            <div class="text-caption text-uppercase font-weight-medium">Tools Ready</div>
+            <div class="text-caption text-uppercase font-weight-medium">{{ t('views.home.statusCards.toolsReady') }}</div>
             <div class="text-body-1 font-weight-bold">
               {{ availableTools.length }} / {{ tools.length }}
             </div>
@@ -72,7 +72,7 @@
     <!-- Tools Grid -->
     <h2 class="text-h6 font-weight-bold mb-4 d-flex align-center">
       <v-icon class="mr-2" size="20">mdi-view-grid</v-icon>
-      Available Tools
+      {{ t('views.home.availableTools') }}
     </h2>
     <div class="tools-grid">
       <v-card
@@ -95,7 +95,7 @@
               <v-icon :color="tool.disabled ? 'grey' : tool.color">{{ tool.icon }}</v-icon>
             </v-avatar>
             <div class="flex-grow-1">
-              <h3 class="text-subtitle-1 font-weight-bold">{{ tool.title }}</h3>
+              <h3 class="text-subtitle-1 font-weight-bold">{{ t(tool.title) }}</h3>
               <v-chip
                 v-if="tool.aiRequired"
                 size="x-small"
@@ -104,7 +104,7 @@
                 class="mt-1"
               >
                 <v-icon start size="10">mdi-robot</v-icon>
-                AI
+                {{ t('views.home.aiFeatureTag') }}
               </v-chip>
             </div>
             <v-icon v-if="!tool.disabled" size="20" color="primary">mdi-arrow-right</v-icon>
@@ -112,11 +112,11 @@
               <template #activator="{ props }">
                 <v-icon v-bind="props" size="20" color="grey">mdi-lock</v-icon>
               </template>
-              {{ tool.disabledReason }}
+              {{ t(tool.disabledReason) }}
             </v-tooltip>
           </div>
           <p class="text-body-2 text-medium-emphasis mb-0">
-            {{ tool.description }}
+            {{ t(tool.description) }}
           </p>
         </v-card-text>
       </v-card>
@@ -126,9 +126,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useAppStore } from '../stores/app';
 import { useTools } from '../composables';
 
+const { t } = useI18n();
 const appStore = useAppStore();
 const { tools, availableTools } = useTools();
 

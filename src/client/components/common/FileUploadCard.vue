@@ -36,7 +36,7 @@
         <!-- Loading State -->
         <template v-if="loading">
           <v-progress-circular indeterminate color="primary" size="48" />
-          <div class="text-body-2 text-medium-emphasis mt-3">Processing...</div>
+          <div class="text-body-2 text-medium-emphasis mt-3">{{ t('common.messages.processing') }}</div>
         </template>
 
         <!-- Has File State -->
@@ -45,7 +45,7 @@
           <div class="text-body-1 font-weight-medium mt-3">
             {{ fileName }}
           </div>
-          <div class="text-body-2 text-medium-emphasis mt-1">Click or drag to replace</div>
+          <div class="text-body-2 text-medium-emphasis mt-1">{{ t('components.fileUpload.clickOrDragToReplace') }}</div>
         </template>
 
         <!-- Empty State -->
@@ -54,11 +54,11 @@
             {{ isDragging ? 'mdi-file-download' : fileIcon }}
           </v-icon>
           <div class="text-body-1 mt-3">
-            <span class="text-primary font-weight-medium">Click to upload</span>
-            <span class="text-medium-emphasis"> or drag and drop</span>
+            <span class="text-primary font-weight-medium">{{ t('components.fileUpload.clickToUpload') }}</span>
+            <span class="text-medium-emphasis"> {{ t('components.fileUpload.orDragAndDrop') }}</span>
           </div>
           <div class="text-body-2 text-medium-emphasis mt-1">
-            {{ acceptLabel }}
+            {{ resolvedAcceptLabel }}
           </div>
         </template>
       </div>
@@ -68,6 +68,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -91,7 +94,7 @@ const props = withDefaults(
     file: () => [],
     loading: false,
     multiple: false,
-    acceptLabel: 'Select a file',
+    acceptLabel: undefined,
   }
 );
 
@@ -100,6 +103,10 @@ const emit = defineEmits<{
   upload: [value: File | File[] | null];
 }>();
 
+const resolvedAcceptLabel = computed(
+  () => props.acceptLabel ?? t('components.fileUpload.selectFile')
+);
+
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const isDragging = ref(false);
 
@@ -107,7 +114,7 @@ const hasFile = computed(() => props.file && props.file.length > 0);
 const fileName = computed(() => {
   if (!props.file || props.file.length === 0) return '';
   if (props.file.length === 1) return props.file[0].name;
-  return `${props.file.length} files selected`;
+  return t('components.fileUpload.filesSelected', { count: props.file.length });
 });
 
 function openFilePicker() {

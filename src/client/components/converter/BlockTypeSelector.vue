@@ -2,7 +2,7 @@
   <v-menu>
     <template #activator="{ props: menuProps }">
       <v-btn v-bind="{ ...menuProps, ...$attrs }" variant="tonal" prepend-icon="mdi-plus">
-        Add Block
+        {{ t('components.converter.addBlock') }}
       </v-btn>
     </template>
     <v-list density="compact" max-height="400">
@@ -22,8 +22,11 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import type { TransformBlockType, BlockTypeInfo } from '@shared/types/converter';
 import { BLOCK_TYPES } from '@shared/types/converter';
+
+const { t } = useI18n();
 
 defineOptions({
   inheritAttrs: false,

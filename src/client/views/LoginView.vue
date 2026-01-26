@@ -7,9 +7,9 @@
           <!-- Header -->
           <v-card-title class="text-center py-6">
             <div class="d-flex flex-column align-center">
-              <v-img :src="logoSrc" alt="FireflyIII Toolbox" width="64" height="64" class="mb-4" />
-              <h1 class="text-h5 font-weight-bold">FireflyIII Toolbox</h1>
-              <p class="text-body-2 text-medium-emphasis mt-1">Sign in to continue</p>
+              <v-img :src="logoSrc" :alt="t('app.title')" width="64" height="64" class="mb-4" />
+              <h1 class="text-h5 font-weight-bold">{{ t('app.title') }}</h1>
+              <p class="text-body-2 text-medium-emphasis mt-1">{{ t('views.login.subtitle') }}</p>
             </div>
           </v-card-title>
 
@@ -31,7 +31,7 @@
             <!-- Loading State -->
             <div v-if="authStore.loading" class="text-center py-8">
               <v-progress-circular indeterminate color="primary" size="48" />
-              <p class="text-body-2 text-medium-emphasis mt-4">Authenticating...</p>
+              <p class="text-body-2 text-medium-emphasis mt-4">{{ t('common.messages.authenticating') }}</p>
             </div>
 
             <!-- No Auth Methods Configured -->
@@ -41,10 +41,9 @@
               variant="tonal"
               class="mb-0"
             >
-              <v-alert-title>No Authentication Configured</v-alert-title>
+              <v-alert-title>{{ t('views.login.noAuthConfigured') }}</v-alert-title>
               <p class="text-body-2 mb-0">
-                Please configure authentication in your environment variables. See the documentation
-                for available options.
+                {{ t('views.login.noAuthMessage') }}
               </p>
             </v-alert>
 
@@ -58,7 +57,7 @@
               >
                 <v-text-field
                   v-model="username"
-                  label="Username"
+                  :label="t('common.labels.username')"
                   prepend-inner-icon="mdi-account"
                   variant="outlined"
                   density="comfortable"
@@ -70,7 +69,7 @@
 
                 <v-text-field
                   v-model="password"
-                  label="Password"
+                  :label="t('common.labels.password')"
                   :type="showPassword ? 'text' : 'password'"
                   prepend-inner-icon="mdi-lock"
                   :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
@@ -91,14 +90,14 @@
                   :loading="authStore.loading"
                 >
                   <v-icon start>mdi-login</v-icon>
-                  Sign In
+                  {{ t('common.buttons.signIn') }}
                 </v-btn>
               </v-form>
 
               <!-- OAuth Divider -->
               <div v-if="authStore.hasBasicAuth && authStore.hasOAuth" class="my-6">
                 <v-divider>
-                  <span class="text-caption text-medium-emphasis px-3">or continue with</span>
+                  <span class="text-caption text-medium-emphasis px-3">{{ t('views.login.orContinueWith') }}</span>
                 </v-divider>
               </div>
 
@@ -125,7 +124,7 @@
 
         <!-- Info text -->
         <p class="text-body-2 text-medium-emphasis text-center mt-6">
-          Extend your FireflyIII with powerful automation tools
+          {{ t('views.home.extendYourFirefly') }}
         </p>
       </v-col>
     </v-row>
@@ -135,10 +134,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
 import { useAppStore } from '../stores/app';
 import type { OAuthProviderInfo } from '@shared/types/auth';
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
@@ -154,7 +155,7 @@ const basicForm = ref<HTMLFormElement | null>(null);
 
 // Validation rules
 const rules = {
-  required: (v: string) => !!v || 'This field is required',
+  required: (v: string) => !!v || t('common.messages.thisFieldIsRequired'),
 };
 
 // Get error from URL query params (OAuth callback errors)
@@ -164,18 +165,19 @@ const errorFromUrl = computed(() => route.query.error as string | undefined);
 function getErrorMessage(errorCode: string | undefined): string {
   if (!errorCode) return '';
 
-  const errorMessages: Record<string, string> = {
-    invalid_session: 'Your session has expired. Please try again.',
-    authentication_failed: 'Authentication failed. Please try again.',
-    token_exchange_failed: 'Failed to complete authentication. Please try again.',
-    user_info_failed: 'Failed to retrieve user information.',
-    invalid_state: 'Invalid authentication state. Please try again.',
-    oidc_not_configured: 'Single Sign-On is not configured.',
-    firefly_oauth_not_configured: 'FireflyIII OAuth is not configured.',
-    access_denied: 'Access was denied by the authentication provider.',
+  const errorKeyMap: Record<string, string> = {
+    invalid_session: 'views.login.errors.invalidSession',
+    authentication_failed: 'views.login.errors.authenticationFailed',
+    token_exchange_failed: 'views.login.errors.tokenExchangeFailed',
+    user_info_failed: 'views.login.errors.userInfoFailed',
+    invalid_state: 'views.login.errors.invalidState',
+    oidc_not_configured: 'views.login.errors.oidcNotConfigured',
+    firefly_oauth_not_configured: 'views.login.errors.fireflyOAuthNotConfigured',
+    access_denied: 'views.login.errors.accessDenied',
   };
 
-  return errorMessages[errorCode] || `Authentication error: ${errorCode}`;
+  const key = errorKeyMap[errorCode];
+  return key ? t(key) : t('views.login.errors.authenticationError', { code: errorCode });
 }
 
 // Get icon for OAuth provider

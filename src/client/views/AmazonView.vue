@@ -19,10 +19,10 @@
           <!-- Row 1: File Upload -->
           <FileUploadCard
             v-model:file="uploadFile"
-            title="Upload Amazon Orders JSON"
+            :title="t('views.amazon.uploadTitle')"
             accept=".json,application/json"
             file-icon="mdi-file-document"
-            accept-label="JSON files only"
+            :accept-label="t('views.amazon.acceptLabel')"
             :loading="uploading"
             @upload="uploadOrders"
           />
@@ -32,30 +32,30 @@
             <v-card-title class="d-flex align-center justify-space-between py-2">
               <div class="d-flex align-center">
                 <v-icon class="mr-2">mdi-package-variant</v-icon>
-                Orders Preview
+                {{ t('views.amazon.ordersPreview') }}
               </div>
               <v-chip v-if="loadedOrders.length > 0" size="small" color="success" variant="tonal">
                 <v-icon start size="small">mdi-package</v-icon>
-                {{ loadedOrders.length }} orders
+                {{ t('views.amazon.ordersCount', { count: loadedOrders.length }) }}
               </v-chip>
             </v-card-title>
             <v-card-text>
               <EmptyState
                 v-if="loadedOrders.length === 0"
                 icon="mdi-package-variant-closed"
-                title="No orders loaded"
-                subtitle="Upload your Amazon order export JSON file to see a preview"
+                :title="t('views.amazon.noOrdersLoaded')"
+                :subtitle="t('views.amazon.uploadFileToPreview')"
               />
               <template v-else>
                 <div class="preview-table-container">
                   <v-table density="compact" class="preview-table">
                     <thead>
                       <tr>
-                        <th>Order ID</th>
-                        <th>Date</th>
-                        <th>Items</th>
-                        <th class="text-right">Amount</th>
-                        <th>Status</th>
+                        <th>{{ t('views.amazon.orderID') }}</th>
+                        <th>{{ t('common.labels.date') }}</th>
+                        <th>{{ t('views.amazon.items') }}</th>
+                        <th class="text-right">{{ t('common.labels.amount') }}</th>
+                        <th>{{ t('common.labels.status') }}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -68,7 +68,7 @@
                           <v-tooltip location="top">
                             <template #activator="{ props: tooltipProps }">
                               <span v-bind="tooltipProps" class="cursor-help">
-                                {{ order.items.length }} item(s)
+                                {{ t('views.amazon.itemsCount', { count: order.items.length }) }}
                               </span>
                             </template>
                             <div class="text-caption">
@@ -77,7 +77,7 @@
                                 }}{{ item.title.length > 50 ? '...' : '' }}
                               </div>
                               <div v-if="order.items.length > 5" class="text-medium-emphasis">
-                                ...and {{ order.items.length - 5 }} more
+                                {{ t('common.labels.andMore', { count: order.items.length - 5 }) }}
                               </div>
                             </div>
                           </v-tooltip>
@@ -102,7 +102,7 @@
                   v-if="loadedOrders.length > 10"
                   class="text-center text-caption text-medium-emphasis pt-3"
                 >
-                  Showing first 10 of {{ loadedOrders.length }} orders
+                  {{ t('views.amazon.showingFirst10', { total: loadedOrders.length }) }}
                 </div>
               </template>
             </v-card-text>
@@ -118,15 +118,15 @@
           :transactions="preview.transactions.value"
           :count="preview.count.value ?? 0"
           :loading="preview.fetching.value || preview.loadingMore.value"
-          loading-text="Fetching Amazon transactions..."
+          :loading-text="t('views.amazon.loadingText')"
           @change="debouncedFetchTransactions"
           @load-more="loadMoreTransactions"
         >
           <template #options>
             <v-checkbox
               v-model="excludeProcessed"
-              label="Hide already processed transactions"
-              hint="Transactions tagged with 'FFIII Toolbox: Amazon Extender' will be excluded"
+              :label="t('common.labels.hideAlreadyProcessed')"
+              :hint="t('views.amazon.alreadyProcessedHint')"
               persistent-hint
               hide-details="auto"
               density="compact"
@@ -152,8 +152,8 @@
         <EmptyState
           v-if="!matching && matchResults.length === 0"
           icon="mdi-magnify"
-          title="Ready to match"
-          subtitle="Click 'Match Transactions' to find matches between your Amazon orders and Firefly transactions"
+          :title="t('common.messages.readyToMatch')"
+          :subtitle="t('views.amazon.clickToMatch')"
         />
 
         <!-- Results -->
@@ -163,12 +163,12 @@
             :stats="[
               {
                 icon: 'mdi-check',
-                label: `${matchResults.filter((m) => m.matchedOrder).length} matches`,
+                label: t('common.labels.countMatches', { count: matchResults.filter((m) => m.matchedOrder).length }),
                 color: 'success',
               },
               {
                 icon: 'mdi-help',
-                label: `${matchResults.filter((m) => !m.matchedOrder).length} unmatched`,
+                label: t('common.labels.countUnmatched', { count: matchResults.filter((m) => !m.matchedOrder).length }),
                 color: 'grey',
               },
             ]"
@@ -176,8 +176,8 @@
             :selectable-count="matchResults.filter((m) => m.matchedOrder).length"
             :all-selected="allMatchesSelected"
             :selected-count="selection.selected.value.length"
-            select-all-text="Select All Matches"
-            action-text="Apply Selected"
+            :select-all-text="t('common.labels.selectAllMatches')"
+            :action-text="t('common.buttons.applySelected')"
             action-color="success"
             action-icon="mdi-check-all"
             :action-loading="applying"
@@ -232,7 +232,7 @@
                         :score="result.matchConfidence"
                       />
                       <v-chip v-else size="small" color="grey" variant="outlined">
-                        No match
+                        {{ t('common.labels.noMatch') }}
                       </v-chip>
                     </div>
                   </div>
@@ -247,11 +247,11 @@
                       class="mb-3"
                       icon="mdi-link-variant"
                     >
-                      <strong>Matched Order:</strong>
+                      <strong>{{ t('views.amazon.matchedOrder') }}</strong>
                       <span class="ml-2">{{ result.matchedOrder.orderId }}</span>
                     </v-alert>
 
-                    <div class="text-subtitle-2 mb-2">Order Items:</div>
+                    <div class="text-subtitle-2 mb-2">{{ t('views.amazon.orderItems') }}</div>
                     <v-list density="compact" class="bg-transparent">
                       <v-list-item
                         v-for="(item, idx) in result.matchedOrder.items"
@@ -271,7 +271,7 @@
 
                     <v-divider class="my-3" />
 
-                    <div class="text-subtitle-2 mb-1">New Description:</div>
+                    <div class="text-subtitle-2 mb-1">{{ t('views.amazon.newDescription') }}</div>
                     <v-text-field
                       v-model="customDescriptions[result.transactionId]"
                       density="compact"
@@ -280,7 +280,7 @@
                       class="mb-3"
                     />
 
-                    <div class="text-subtitle-2 mb-1">New Notes:</div>
+                    <div class="text-subtitle-2 mb-1">{{ t('views.amazon.newNotes') }}</div>
                     <v-textarea
                       v-model="customNotes[result.transactionId]"
                       density="compact"
@@ -302,8 +302,8 @@
         <FinalActionButton
           v-if="currentStep === 3"
           :has-run="hasMatched"
-          text="Match Transactions"
-          rerun-text="Re-match"
+          :text="t('common.buttons.matchTransactions')"
+          :rerun-text="t('common.buttons.rematch')"
           icon="mdi-magnify"
           rerun-icon="mdi-refresh"
           :loading="matching"
@@ -316,6 +316,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import api from '../services/api';
 import type {
   AmazonOrder,
@@ -346,16 +347,19 @@ import {
 } from '../composables';
 import { formatCurrency, formatDate, AmazonMatchResultSchema, validateFileSize } from '../utils';
 
+// i18n
+const { t } = useI18n();
+
 // Snackbar
 const { showSnackbar } = useSnackbar();
 
 // Wizard state
 const currentStep = ref(1);
-const wizardSteps = [
-  { title: 'Upload Orders', subtitle: 'Load Amazon order data' },
-  { title: 'Date Range', subtitle: 'Select transactions to match' },
-  { title: 'Match & Review', subtitle: 'Review and apply changes' },
-];
+const wizardSteps = computed(() => [
+  { title: t('views.amazon.steps.uploadOrders.title'), subtitle: t('views.amazon.steps.uploadOrders.subtitle') },
+  { title: t('common.steps.dateRange'), subtitle: t('common.steps.selectTransactionsToMatch') },
+  { title: t('common.steps.matchReview'), subtitle: t('common.steps.reviewAndApplyChanges') },
+]);
 
 // Step 1: Upload state
 const uploadFile = ref<File[]>([]);
@@ -420,24 +424,24 @@ const stepLoading = computed(() => {
 const nextButtonText = computed(() => {
   switch (currentStep.value) {
     case 1:
-      return 'Configure Date Range';
+      return t('common.steps.dateRange');
     case 2:
-      return 'Match Transactions';
+      return t('common.buttons.matchTransactions');
     default:
-      return 'Next';
+      return t('common.buttons.next');
   }
 });
 
 const statusMessage = computed(() => {
   if (currentStep.value === 1) {
     if (loadedOrders.value.length === 0) return '';
-    return `${loadedOrders.value.length} orders loaded`;
+    return t('views.amazon.ordersCount', { count: loadedOrders.value.length });
   }
   if (currentStep.value === 2) {
-    if (preview.fetching.value) return 'Fetching...';
+    if (preview.fetching.value) return t('common.messages.fetching');
     if (preview.count.value === null) return '';
-    if (preview.count.value === 0) return 'No transactions found';
-    return `${preview.count.value} transactions`;
+    if (preview.count.value === 0) return t('common.messages.noTransactionsFound');
+    return t('common.labels.countTransactions', { count: preview.count.value });
   }
   return '';
 });
@@ -508,10 +512,10 @@ async function uploadOrders(fileOrFiles: File | File[] | null) {
     });
 
     loadedOrders.value = response.data.data.orders;
-    showSnackbar(`Loaded ${loadedOrders.value.length} Amazon orders`, 'success');
+    showSnackbar(t('views.amazon.loadedOrders', { count: loadedOrders.value.length }), 'success');
   } catch (error) {
     console.error('Upload error:', error);
-    showSnackbar(error instanceof Error ? error.message : 'Failed to upload orders', 'error');
+    showSnackbar(error instanceof Error ? error.message : t('views.amazon.failedToUpload'), 'error');
   } finally {
     uploading.value = false;
     uploadFile.value = [];
@@ -571,7 +575,7 @@ function handleStreamEvent(
         progressData.current || 0,
         progressData.total || 0,
         progressData.message ||
-          `Matching transaction ${progressData.current} of ${progressData.total}...`
+          t('common.messages.matchingTransaction', { current: progressData.current, total: progressData.total })
       );
       break;
     }
@@ -593,7 +597,7 @@ function handleStreamEvent(
     }
     case 'error': {
       const errorData = event.data as { error: string };
-      showSnackbar(errorData?.error || 'An error occurred', 'error');
+      showSnackbar(errorData?.error || t('common.messages.somethingWentWrong'), 'error');
       break;
     }
     case 'complete':
@@ -627,17 +631,17 @@ async function matchTransactions() {
     const matchCount = matchResults.value.filter((m) => m.matchedOrder).length;
     if (validationErrorCount.value > 0) {
       showSnackbar(
-        `${validationErrorCount.value} item(s) skipped due to data errors. Check console for details.`,
+        t('common.messages.itemsSkipped', { count: validationErrorCount.value }),
         'warning'
       );
     } else if (matchCount > 0) {
       showSnackbar(
-        `Found ${matchCount} matches out of ${matchResults.value.length} transactions`,
+        t('views.amazon.foundMatches', { matches: matchCount, total: matchResults.value.length }),
         'info'
       );
     }
   } catch (error) {
-    showSnackbar(error instanceof Error ? error.message : 'Failed to match transactions', 'error');
+    showSnackbar(error instanceof Error ? error.message : t('common.errors.failedToMatchTransactions'), 'error');
   } finally {
     matching.value = false;
   }
@@ -667,7 +671,10 @@ async function applySelected() {
     const result = response.data.data;
 
     showSnackbar(
-      `Updated ${result.successful.length} descriptions${result.failed.length > 0 ? `, ${result.failed.length} failed` : ''}`,
+      t('views.amazon.updatedDescriptions', { 
+        successful: result.successful.length,
+        failed: result.failed.length > 0 ? result.failed.length : 0
+      }),
       result.failed.length > 0 ? 'warning' : 'success'
     );
 
@@ -676,7 +683,7 @@ async function applySelected() {
     );
     selection.clear();
   } catch (error) {
-    showSnackbar(error instanceof Error ? error.message : 'Failed to apply descriptions', 'error');
+    showSnackbar(error instanceof Error ? error.message : t('common.errors.failedToApplyDescriptions'), 'error');
   } finally {
     applying.value = false;
   }
@@ -685,11 +692,11 @@ async function applySelected() {
 // Get breakdown items for the confidence breakdown component
 function getAmazonBreakdownItems(breakdown: AmazonConfidenceBreakdown): BreakdownItem[] {
   return [
-    { label: 'Order ID Match', value: breakdown.orderIdMatch, max: 0.5 },
-    { label: 'Amount Match', value: breakdown.amountMatch, max: 0.2 },
-    { label: 'Exact Amount Bonus', value: breakdown.exactAmountBonus, max: 0.1 },
-    { label: 'Date Proximity', value: breakdown.dateProximity, max: 0.1 },
-    { label: 'Item Title Match', value: breakdown.itemTitleMatch, max: 0.1 },
+    { label: t('views.amazon.breakdown.orderIdMatch'), value: breakdown.orderIdMatch, max: 0.5 },
+    { label: t('common.labels.amountMatch'), value: breakdown.amountMatch, max: 0.2 },
+    { label: t('common.labels.exactAmountBonus'), value: breakdown.exactAmountBonus, max: 0.1 },
+    { label: t('common.labels.dateProximity'), value: breakdown.dateProximity, max: 0.1 },
+    { label: t('views.amazon.breakdown.itemTitleMatch'), value: breakdown.itemTitleMatch, max: 0.1 },
   ];
 }
 </script>

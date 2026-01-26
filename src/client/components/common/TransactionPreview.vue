@@ -3,7 +3,7 @@
     <v-card-title class="d-flex align-center justify-space-between py-2">
       <div class="d-flex align-center">
         <v-icon class="mr-2" size="small">mdi-format-list-bulleted</v-icon>
-        Transaction Preview
+        {{ t('components.transactionPreview.title') }}
       </div>
       <v-chip v-if="totalCount > 0" size="small" color="success" variant="tonal">
         <v-icon start size="small">mdi-file-document-multiple</v-icon>
@@ -17,7 +17,7 @@
         class="d-flex align-center justify-center py-8 flex-grow-1"
       >
         <v-progress-circular indeterminate size="24" class="mr-3" />
-        <span class="text-body-2 text-medium-emphasis">{{ loadingText }}</span>
+        <span class="text-body-2 text-medium-emphasis">{{ resolvedLoadingText }}</span>
       </div>
 
       <!-- Empty State -->
@@ -26,8 +26,8 @@
         class="d-flex flex-column align-center justify-center text-medium-emphasis flex-grow-1"
       >
         <v-icon size="48" class="mb-2">mdi-file-document-outline</v-icon>
-        <span class="text-body-1">No transactions to preview</span>
-        <span class="text-body-2 mt-1">Select a date range to load transactions</span>
+        <span class="text-body-1">{{ t('components.transactionPreview.noTransactions') }}</span>
+        <span class="text-body-2 mt-1">{{ t('components.transactionPreview.selectDateRange') }}</span>
       </div>
 
       <!-- Transaction Table -->
@@ -43,7 +43,7 @@
           >
             <div class="d-flex align-center">
               <v-progress-circular indeterminate size="24" class="mr-3" />
-              <span class="text-body-2">{{ loadingText }}</span>
+              <span class="text-body-2">{{ resolvedLoadingText }}</span>
             </div>
           </v-overlay>
 
@@ -51,11 +51,11 @@
             <v-table density="compact" class="transaction-table">
               <thead>
                 <tr>
-                  <th class="date-col">Date</th>
-                  <th class="description-col">Description</th>
-                  <th class="accounts-col">From → To</th>
-                  <th class="amount-col text-right">Amount</th>
-                  <th class="category-col">Category</th>
+                  <th class="date-col">{{ t('common.labels.date') }}</th>
+                  <th class="description-col">{{ t('common.labels.description') }}</th>
+                  <th class="accounts-col">{{ t('components.transactionPreview.fromTo') }}</th>
+                  <th class="amount-col text-right">{{ t('common.labels.amount') }}</th>
+                  <th class="category-col">{{ t('common.labels.category') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -76,7 +76,7 @@
             <!-- Loading more indicator -->
             <div v-if="loadingMore" class="d-flex align-center justify-center py-4">
               <v-progress-circular indeterminate size="20" class="mr-2" />
-              <span class="text-body-2 text-medium-emphasis">Loading more...</span>
+              <span class="text-body-2 text-medium-emphasis">{{ t('components.transactionPreview.loadingMore') }}</span>
             </div>
           </div>
         </div>
@@ -87,7 +87,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { FireflyTransactionSplit } from '@shared/types/firefly';
+
+const { t } = useI18n();
 
 interface Props {
   transactions: FireflyTransactionSplit[];
@@ -101,8 +104,12 @@ const props = withDefaults(defineProps<Props>(), {
   count: undefined,
   loading: false,
   loadingMore: false,
-  loadingText: 'Fetching transactions...',
+  loadingText: undefined,
 });
+
+const resolvedLoadingText = computed(
+  () => props.loadingText ?? t('common.status.fetchingTransactions')
+);
 
 // Show overlay when loading but we already have transactions (refreshing)
 const isRefreshing = computed(

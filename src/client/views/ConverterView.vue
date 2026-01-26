@@ -21,10 +21,10 @@
             <v-col cols="12" md="6" class="d-flex">
               <FileUploadCard
                 v-model:file="uploadFile"
-                title="Bank Export CSV"
+                :title="t('views.converter.uploadTitle')"
                 accept=".csv,text/csv"
                 file-icon="mdi-file-delimited"
-                accept-label="CSV files only"
+                :accept-label="t('views.paypal.acceptLabel')"
                 :loading="converter.processing.value"
                 class="flex-grow-1"
                 @upload="onFileUpload"
@@ -37,7 +37,7 @@
                 <v-card-title class="d-flex align-center justify-space-between py-2">
                   <div class="d-flex align-center">
                     <v-icon class="mr-2" size="small">mdi-cog</v-icon>
-                    CSV Options
+                    {{ t('views.converter.csvOptions') }}
                   </div>
                   <div class="d-flex align-center ga-2">
                     <v-btn
@@ -46,7 +46,7 @@
                       prepend-icon="mdi-folder-open"
                       @click="onLoadFullConfig"
                     >
-                      Load Config
+                      {{ t('common.buttons.loadConfig') }}
                     </v-btn>
                     <input
                       ref="fullConfigFileInput"
@@ -63,7 +63,7 @@
                       <v-select
                         v-model="converter.config.value.csvOptions.delimiter"
                         :items="delimiterOptions"
-                        label="Delimiter"
+                        :label="t('common.labels.delimiter')"
                         variant="outlined"
                         density="compact"
                         hide-details
@@ -74,7 +74,7 @@
                       <v-select
                         v-model="converter.config.value.csvOptions.quoteChar"
                         :items="quoteOptions"
-                        label="Quote Character"
+                        :label="t('common.labels.quoteCharacter')"
                         variant="outlined"
                         density="compact"
                         hide-details
@@ -84,7 +84,7 @@
                     <v-col cols="6">
                       <v-text-field
                         v-model.number="converter.config.value.csvOptions.skipRows"
-                        label="Skip Rows"
+                        :label="t('common.labels.skipRows')"
                         type="number"
                         min="0"
                         variant="outlined"
@@ -96,7 +96,7 @@
                     <v-col cols="6" class="d-flex align-center">
                       <v-checkbox
                         v-model="converter.config.value.csvOptions.hasHeader"
-                        label="First row is header"
+                        :label="t('common.labels.firstRowIsHeader')"
                         density="compact"
                         hide-details
                         @update:model-value="reParseCSV"
@@ -105,14 +105,13 @@
                   </v-row>
                   <div v-if="converter.parsedCSV.value" class="mt-3">
                     <div class="text-caption text-medium-emphasis">
-                      <strong>{{ converter.parsedCSV.value.headers.length }}</strong> columns
-                      detected:
+                      <strong>{{ converter.parsedCSV.value.headers.length }}</strong> {{ t('views.converter.columnsDetected') }}
                     </div>
                     <div
                       class="text-caption text-truncate"
-                      :title="converter.parsedCSV.value.headers.join(', ')"
+                      :title="converter.parsedCSV.value.headers.join(t('views.converter.commaSeparator'))"
                     >
-                      {{ converter.parsedCSV.value.headers.join(', ') }}
+                      {{ converter.parsedCSV.value.headers.join(t('views.converter.commaSeparator')) }}
                     </div>
                   </div>
                 </v-card-text>
@@ -125,7 +124,7 @@
             <v-card-title class="d-flex align-center justify-space-between">
               <div class="d-flex align-center">
                 <v-icon class="mr-2">mdi-table</v-icon>
-                Data Preview
+                {{ t('common.labels.dataPreview') }}
               </div>
               <v-chip
                 v-if="converter.parsedCSV.value?.rows.length"
@@ -134,7 +133,7 @@
                 variant="tonal"
               >
                 <v-icon start size="small">mdi-table-row</v-icon>
-                {{ converter.parsedCSV.value.rows.length }} rows
+                {{ t('views.converter.rowsCount', { count: converter.parsedCSV.value.rows.length }) }}
               </v-chip>
             </v-card-title>
             <v-card-text>
@@ -142,8 +141,8 @@
               <EmptyState
                 v-if="!converter.parsedCSV.value || converter.parsedCSV.value.rows.length === 0"
                 icon="mdi-table-question"
-                title="No data to preview"
-                subtitle="Use the upload area above to load a CSV file"
+                :title="t('common.messages.noDataToPreview')"
+                :subtitle="t('views.converter.useUploadArea')"
               />
 
               <!-- Table when data exists -->
@@ -170,7 +169,7 @@
                   v-if="converter.parsedCSV.value.rows.length > 10"
                   class="text-center text-caption text-medium-emphasis pt-3"
                 >
-                  Showing first 10 of {{ converter.parsedCSV.value.rows.length }} rows
+                  {{ t('views.converter.showingFirstRows', { count: converter.parsedCSV.value.rows.length }) }}
                 </div>
               </template>
             </v-card-text>
@@ -186,7 +185,7 @@
             <div class="d-flex align-center ga-3">
               <div class="d-flex align-center">
                 <v-icon class="mr-2">mdi-swap-horizontal</v-icon>
-                <span class="text-subtitle-1 font-weight-medium">Column Mapping</span>
+                <span class="text-subtitle-1 font-weight-medium">{{ t('common.labels.columnMapping') }}</span>
               </div>
               <v-menu>
                 <template #activator="{ props: menuProps }">
@@ -197,7 +196,7 @@
                     size="small"
                     prepend-icon="mdi-plus"
                   >
-                    Add Column
+                    {{ t('common.buttons.addColumn') }}
                   </v-btn>
                 </template>
                 <v-list density="compact" max-height="400">
@@ -210,7 +209,7 @@
                     <v-list-item-subtitle>{{ column.description }}</v-list-item-subtitle>
                     <template #append>
                       <v-chip v-if="column.required" size="x-small" color="error">
-                        Required
+                        {{ t('common.labels.required') }}
                       </v-chip>
                     </template>
                   </v-list-item>
@@ -220,7 +219,7 @@
             <div class="d-flex align-center ga-2">
               <v-btn icon variant="text" size="small" color="info" @click="showHelpDialog = true">
                 <v-icon>mdi-help-circle-outline</v-icon>
-                <v-tooltip activator="parent" location="bottom">How to use</v-tooltip>
+                <v-tooltip activator="parent" location="bottom">{{ t('common.buttons.howToUse') }}</v-tooltip>
               </v-btn>
               <v-btn
                 variant="tonal"
@@ -228,7 +227,7 @@
                 prepend-icon="mdi-content-save"
                 @click="onSaveConfig"
               >
-                Save Config
+                {{ t('common.buttons.saveConfig') }}
               </v-btn>
               <v-btn
                 variant="tonal"
@@ -236,7 +235,7 @@
                 prepend-icon="mdi-folder-open"
                 @click="onLoadConfig"
               >
-                Load Config
+                {{ t('common.buttons.loadConfig') }}
               </v-btn>
               <input
                 ref="configFileInput"
@@ -278,41 +277,39 @@
           <v-card rounded="lg">
             <v-card-title class="d-flex align-center">
               <v-icon class="mr-2" color="info">mdi-help-circle</v-icon>
-              How to Use Column Mapping
+              {{ t('common.help.howToUseColumnMapping') }}
             </v-card-title>
             <v-card-text>
               <v-list density="compact">
                 <v-list-item prepend-icon="mdi-numeric-1-circle">
-                  <v-list-item-title>Configure each column</v-list-item-title>
+                  <v-list-item-title>{{ t('common.help.configureEachColumn') }}</v-list-item-title>
                   <v-list-item-subtitle>
-                    Each card represents a Firefly III field. Add transformation blocks to map your
-                    CSV data.
+                    {{ t('common.help.configureEachColumnDesc') }}
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item prepend-icon="mdi-numeric-2-circle">
-                  <v-list-item-title>Add transformation blocks</v-list-item-title>
+                  <v-list-item-title>{{ t('common.help.addTransformationBlocks') }}</v-list-item-title>
                   <v-list-item-subtitle>
-                    Use blocks like "Source Column", "Static Value", "Replace", or "Conditional" to
-                    transform data.
+                    {{ t('common.help.addTransformationBlocksDesc') }}
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item prepend-icon="mdi-numeric-3-circle">
-                  <v-list-item-title>Drag and drop to reorder</v-list-item-title>
+                  <v-list-item-title>{{ t('common.help.dragAndDrop') }}</v-list-item-title>
                   <v-list-item-subtitle>
-                    Blocks are processed top to bottom. Drag to change the order.
+                    {{ t('common.help.dragAndDropDesc') }}
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item prepend-icon="mdi-numeric-4-circle">
-                  <v-list-item-title>Save your configuration</v-list-item-title>
+                  <v-list-item-title>{{ t('common.help.saveConfiguration') }}</v-list-item-title>
                   <v-list-item-subtitle>
-                    Use "Save Config" to export your mapping for reuse with similar bank exports.
+                    {{ t('common.help.saveConfigurationDesc') }}
                   </v-list-item-subtitle>
                 </v-list-item>
               </v-list>
             </v-card-text>
             <v-card-actions>
               <v-spacer />
-              <v-btn color="primary" variant="text" @click="showHelpDialog = false"> Got it </v-btn>
+              <v-btn color="primary" variant="text" @click="showHelpDialog = false"> {{ t('common.buttons.gotIt') }} </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -326,7 +323,7 @@
             <v-card-title class="d-flex align-center justify-space-between">
               <div class="d-flex align-center">
                 <v-icon class="mr-2">mdi-eye</v-icon>
-                Preview
+                {{ t('common.labels.preview') }}
               </div>
               <v-btn
                 variant="text"
@@ -334,7 +331,7 @@
                 prepend-icon="mdi-refresh"
                 @click="() => converter.generatePreview(20)"
               >
-                Refresh
+                {{ t('common.buttons.refresh') }}
               </v-btn>
             </v-card-title>
             <v-card-text>
@@ -342,15 +339,15 @@
               <div class="d-flex align-center ga-4 mb-4 flex-shrink-0">
                 <v-chip color="primary" variant="tonal">
                   <v-icon start>mdi-table-row</v-icon>
-                  {{ converter.parsedCSV.value?.rows.length || 0 }} input rows
+                  {{ t('views.converter.inputRows', { count: converter.parsedCSV.value?.rows.length || 0 }) }}
                 </v-chip>
                 <v-chip v-if="converter.preview.value?.removedRows" color="warning" variant="tonal">
                   <v-icon start>mdi-table-row-remove</v-icon>
-                  {{ converter.preview.value.removedRows }} rows removed
+                  {{ t('common.labels.countRowsRemoved', { count: converter.preview.value.removedRows }) }}
                 </v-chip>
                 <v-chip color="success" variant="tonal">
                   <v-icon start>mdi-table-column</v-icon>
-                  {{ enabledColumnCount }} output columns
+                  {{ t('common.labels.countOutputColumns', { count: enabledColumnCount }) }}
                 </v-chip>
               </div>
 
@@ -362,10 +359,10 @@
                 density="compact"
                 class="mb-4 flex-shrink-0"
               >
-                <strong>{{ converter.preview.value.errors.length }} errors detected:</strong>
+                <strong>{{ t('common.labels.countErrorsDetected', { count: converter.preview.value.errors.length }) }}</strong>
                 <ul class="mt-2 mb-0">
                   <li v-for="(error, idx) in converter.preview.value.errors.slice(0, 5)" :key="idx">
-                    Row {{ error.row }}: {{ error.message }}
+                    {{ t('common.labels.rowError', { row: error.row, message: error.message }) }}
                   </li>
                 </ul>
               </v-alert>
@@ -393,8 +390,8 @@
               <EmptyState
                 v-else
                 icon="mdi-table-off"
-                title="No preview available"
-                subtitle="Configure your column mapping to see a preview"
+                :title="t('common.messages.noPreviewAvailable')"
+                :subtitle="t('common.help.configureMappingToPreview')"
               />
             </v-card-text>
           </v-card>
@@ -405,12 +402,12 @@
               <v-card rounded="lg" class="flex-grow-1 d-flex flex-column">
                 <v-card-title class="d-flex align-center py-3">
                   <v-icon class="mr-2" size="small">mdi-download</v-icon>
-                  Export CSV
+                  {{ t('common.buttons.exportCSV') }}
                 </v-card-title>
                 <v-card-text class="pt-0 flex-grow-1">
                   <v-text-field
                     v-model="exportFilename"
-                    label="Output Filename"
+                    :label="t('common.labels.outputFilename')"
                     variant="outlined"
                     density="compact"
                     suffix=".csv"
@@ -422,7 +419,7 @@
                       <v-select
                         v-model="converter.config.value.exportOptions.delimiter"
                         :items="delimiterOptions"
-                        label="Delimiter"
+                        :label="t('common.labels.delimiter')"
                         variant="outlined"
                         density="compact"
                         hide-details
@@ -432,7 +429,7 @@
                       <v-select
                         v-model="converter.config.value.exportOptions.quoteChar"
                         :items="quoteCharOptions"
-                        label="Quote"
+                        :label="t('common.labels.quoteCharacter')"
                         variant="outlined"
                         density="compact"
                         hide-details
@@ -442,7 +439,7 @@
                       <v-select
                         v-model="converter.config.value.exportOptions.quoteMode"
                         :items="quoteModeOptions"
-                        label="Quoting"
+                        :label="t('components.converter.quoting')"
                         variant="outlined"
                         density="compact"
                         hide-details
@@ -452,7 +449,7 @@
                       <v-select
                         v-model="converter.config.value.exportOptions.lineEnding"
                         :items="lineEndingOptions"
-                        label="Line Ending"
+                        :label="t('components.converter.lineEnding.label')"
                         variant="outlined"
                         density="compact"
                         hide-details
@@ -469,7 +466,7 @@
                     prepend-icon="mdi-download"
                     @click="onDownloadCSV"
                   >
-                    Download CSV
+                    {{ t('common.buttons.downloadCSV') }}
                   </v-btn>
                 </v-card-actions>
               </v-card>
@@ -480,15 +477,15 @@
               <v-card rounded="lg">
                 <v-card-title class="d-flex align-center py-3">
                   <v-icon class="mr-2" size="small">mdi-cloud-upload</v-icon>
-                  Import to Firefly III
+                  {{ t('views.converter.importToFirefly') }}
                 </v-card-title>
                 <v-card-text class="pt-0">
                   <!-- Import Options -->
                   <v-text-field
                     v-model="importOptions.tags"
-                    label="Add Tags"
-                    placeholder="tag1, tag2, ..."
-                    hint="Comma-separated tags to add to all imported transactions"
+                    :label="t('views.converter.addTags')"
+                    :placeholder="t('views.converter.tagsPlaceholder')"
+                    :hint="t('views.converter.tagsHint')"
                     persistent-hint
                     variant="outlined"
                     density="compact"
@@ -500,7 +497,7 @@
                     <v-col cols="6">
                       <v-checkbox
                         v-model="importOptions.applyRules"
-                        label="Apply Firefly III rules"
+                        :label="t('views.converter.applyRules')"
                         density="compact"
                         hide-details
                       />
@@ -508,7 +505,7 @@
                     <v-col cols="6">
                       <v-checkbox
                         v-model="importOptions.errorIfDuplicate"
-                        label="Skip duplicates"
+                        :label="t('common.labels.skipDuplicates')"
                         density="compact"
                         hide-details
                       />
@@ -523,7 +520,7 @@
                     density="compact"
                     class="mb-4"
                   >
-                    Ready to import {{ importValidation.summary.validRows }} transactions
+                    {{ t('common.labels.readyToImportCount', { count: importValidation.summary.validRows }) }}
                   </v-alert>
 
                   <v-alert
@@ -533,7 +530,7 @@
                     density="compact"
                     class="mb-4"
                   >
-                    <div class="font-weight-medium mb-1">Cannot import: validation errors</div>
+                    <div class="font-weight-medium mb-1">{{ t('views.converter.cannotImport') }}</div>
                     <ul class="mb-0 pl-4">
                       <li
                         v-for="(err, idx) in importValidation.errors.slice(0, 5)"
@@ -578,7 +575,7 @@
                       variant="tonal"
                     >
                       <v-icon start size="small">mdi-check</v-icon>
-                      {{ importValidation.summary.validRows }} valid
+                      {{ t('views.converter.validRows', { count: importValidation.summary.validRows }) }}
                     </v-chip>
                     <v-chip
                       v-if="importValidation.summary.rowsWithErrors"
@@ -587,7 +584,7 @@
                       variant="tonal"
                     >
                       <v-icon start size="small">mdi-alert</v-icon>
-                      {{ importValidation.summary.rowsWithErrors }} errors
+                      {{ t('views.converter.rowsWithErrors', { count: importValidation.summary.rowsWithErrors }) }}
                     </v-chip>
                     <v-chip
                       v-if="importValidation.summary.rowsRemoved"
@@ -596,7 +593,7 @@
                       variant="tonal"
                     >
                       <v-icon start size="small">mdi-minus</v-icon>
-                      {{ importValidation.summary.rowsRemoved }} removed
+                      {{ t('common.labels.countRowsRemoved', { count: importValidation.summary.rowsRemoved }) }}
                     </v-chip>
                   </div>
                 </v-card-text>
@@ -611,7 +608,7 @@
                     prepend-icon="mdi-cloud-upload"
                     @click="showImportDialog = true"
                   >
-                    Import to Firefly III
+                    {{ t('views.converter.importToFirefly') }}
                   </v-btn>
                 </v-card-actions>
               </v-card>
@@ -626,20 +623,18 @@
       <v-card rounded="lg">
         <v-card-title class="d-flex align-center">
           <v-icon class="mr-2" color="success">mdi-cloud-upload</v-icon>
-          Confirm Import
+          {{ t('common.buttons.confirmImport') }}
         </v-card-title>
         <v-card-text>
           <p class="mb-4">
-            This will create
-            <strong>{{ importValidation?.summary.validRows || 0 }}</strong> transactions in Firefly
-            III.
+            {{ t('views.converter.confirmImportText', { count: importValidation?.summary.validRows || 0 }) }}
           </p>
 
           <!-- Import settings summary -->
           <div class="d-flex flex-wrap ga-2 mb-4">
             <v-chip v-if="importOptions.tags" size="small" color="primary" variant="tonal">
               <v-icon start size="small">mdi-tag</v-icon>
-              Tags: {{ importOptions.tags }}
+              {{ t('common.labels.tags') }}: {{ importOptions.tags }}
             </v-chip>
             <v-chip
               size="small"
@@ -649,7 +644,7 @@
               <v-icon start size="small">{{
                 importOptions.applyRules ? 'mdi-check' : 'mdi-close'
               }}</v-icon>
-              Rules
+              {{ t('common.labels.rules') }}
             </v-chip>
             <v-chip
               size="small"
@@ -659,7 +654,7 @@
               <v-icon start size="small">{{
                 importOptions.errorIfDuplicate ? 'mdi-check' : 'mdi-close'
               }}</v-icon>
-              Skip duplicates
+              {{ t('common.labels.skipDuplicates') }}
             </v-chip>
           </div>
 
@@ -676,8 +671,7 @@
               class="mb-2"
             />
             <div class="text-caption text-center text-medium-emphasis">
-              {{ converter.importProgress.value.current }} /
-              {{ converter.importProgress.value.total }} transactions
+              {{ t('views.converter.progressText', { current: converter.importProgress.value.current, total: converter.importProgress.value.total }) }}
             </div>
           </div>
 
@@ -687,8 +681,7 @@
             variant="tonal"
             density="compact"
           >
-            <strong>Warning:</strong> Duplicate transactions may be created since "Skip duplicates"
-            is disabled.
+            <strong>{{ t('common.labels.warning') }}:</strong> {{ t('views.converter.duplicateWarning') }}
           </v-alert>
         </v-card-text>
         <v-card-actions>
@@ -698,7 +691,7 @@
             :disabled="converter.processing.value"
             @click="showImportDialog = false"
           >
-            Cancel
+            {{ t('common.buttons.cancel') }}
           </v-btn>
           <v-btn
             color="success"
@@ -706,7 +699,7 @@
             :loading="converter.processing.value"
             @click="onImportToFirefly"
           >
-            Import
+            {{ t('common.buttons.import') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -719,17 +712,17 @@
           <v-icon class="mr-2" :color="importResults?.failed === 0 ? 'success' : 'warning'">
             {{ importResults?.failed === 0 ? 'mdi-check-circle' : 'mdi-alert-circle' }}
           </v-icon>
-          Import Complete
+          {{ t('common.messages.importComplete') }}
         </v-card-title>
         <v-card-text>
           <div class="d-flex ga-4 mb-4">
             <v-chip color="success" variant="tonal">
               <v-icon start>mdi-check</v-icon>
-              {{ importResults?.successful || 0 }} imported
+              {{ t('views.converter.imported', { count: importResults?.successful || 0 }) }}
             </v-chip>
             <v-chip v-if="importResults?.failed" color="error" variant="tonal">
               <v-icon start>mdi-alert</v-icon>
-              {{ importResults.failed }} failed
+              {{ t('views.converter.failed', { count: importResults.failed }) }}
             </v-chip>
           </div>
 
@@ -739,7 +732,7 @@
             variant="tonal"
             density="compact"
           >
-            <div class="font-weight-medium mb-1">Errors:</div>
+            <div class="font-weight-medium mb-1">{{ t('common.labels.errors') }}:</div>
             <ul class="mb-0 pl-4" style="max-height: 200px; overflow-y: auto">
               <li
                 v-for="(err, idx) in importResults.errors.slice(0, 20)"
@@ -749,7 +742,7 @@
                 {{ err }}
               </li>
               <li v-if="importResults.errors.length > 20" class="text-body-2 font-italic">
-                ...and {{ importResults.errors.length - 20 }} more
+                {{ t('common.labels.andMore', { count: importResults.errors.length - 20 }) }}
               </li>
             </ul>
           </v-alert>
@@ -757,7 +750,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn color="primary" variant="flat" @click="showImportResultsDialog = false">
-            Close
+            {{ t('common.buttons.close') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -767,7 +760,7 @@
     <v-snackbar v-model="showError" color="error" :timeout="5000">
       {{ converter.error.value }}
       <template #actions>
-        <v-btn variant="text" @click="showError = false">Close</v-btn>
+        <v-btn variant="text" @click="showError = false">{{ t('common.buttons.close') }}</v-btn>
       </template>
     </v-snackbar>
 
@@ -775,7 +768,7 @@
     <v-snackbar v-model="showSuccess" color="success" :timeout="3000">
       {{ successMessage }}
       <template #actions>
-        <v-btn variant="text" @click="showSuccess = false">Close</v-btn>
+        <v-btn variant="text" @click="showSuccess = false">{{ t('common.buttons.close') }}</v-btn>
       </template>
     </v-snackbar>
   </div>
@@ -783,19 +776,22 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue';
+import { useI18n } from 'vue-i18n';
 import draggable from 'vuedraggable';
 import { WizardStepper, FileUploadCard, EmptyState } from '../components/common';
 import { SwimlaneCard } from '../components/converter';
 import { useConverter } from '../composables/useConverter';
 import { FIREFLY_COLUMNS } from '@shared/types/converter';
 
+const { t } = useI18n();
+
 // Wizard state
 const currentStep = ref(1);
-const wizardSteps = [
-  { title: 'Upload CSV', subtitle: 'Select your bank export file' },
-  { title: 'Configure Mapping', subtitle: 'Map columns and add transformations' },
-  { title: 'Preview & Export', subtitle: 'Review and download converted file' },
-];
+const wizardSteps = computed(() => [
+  { title: t('common.steps.uploadCSV'), subtitle: t('common.steps.selectBankExport') },
+  { title: t('common.steps.configureMapping'), subtitle: t('common.steps.mapColumns') },
+  { title: t('common.steps.previewExport'), subtitle: t('common.steps.reviewAndDownload') },
+]);
 
 // Converter composable
 const converter = useConverter();
@@ -814,7 +810,7 @@ function getDefaultImportTag(): string {
   const now = new Date();
   const date = now.toLocaleDateString('en-CA'); // YYYY-MM-DD format
   const time = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); // HH:MM format
-  return `FFIII Toolbox: Import on ${date} @ ${time}`;
+  return t('views.converter.defaultImportTag', { date, time });
 }
 
 const importOptions = ref({
@@ -843,33 +839,33 @@ watch(
 );
 
 // CSV options
-const delimiterOptions = [
-  { title: 'Comma (,)', value: ',' },
-  { title: 'Semicolon (;)', value: ';' },
-  { title: 'Tab', value: '\t' },
-  { title: 'Pipe (|)', value: '|' },
-];
+const delimiterOptions = computed(() => [
+  { title: t('common.csvOptions.comma'), value: ',' },
+  { title: t('common.csvOptions.semicolon'), value: ';' },
+  { title: t('common.csvOptions.tab'), value: '\t' },
+  { title: t('common.csvOptions.pipe'), value: '|' },
+]);
 
-const quoteCharOptions = [
-  { title: 'Double Quote (")', value: '"' },
-  { title: "Single Quote (')", value: "'" },
-];
+const quoteCharOptions = computed(() => [
+  { title: t('common.csvOptions.doubleQuote'), value: '"' },
+  { title: t('common.csvOptions.singleQuote'), value: "'" },
+]);
 
-const quoteModeOptions = [
-  { title: 'When needed', value: 'needed' },
-  { title: 'Always', value: 'always' },
-  { title: 'Never', value: 'never' },
-];
+const quoteModeOptions = computed(() => [
+  { title: t('components.converter.quoteMode.needed'), value: 'needed' },
+  { title: t('common.csvOptions.always'), value: 'always' },
+  { title: t('common.csvOptions.never'), value: 'never' },
+]);
 
-const lineEndingOptions = [
-  { title: 'LF (Unix/Mac)', value: 'lf' },
-  { title: 'CRLF (Windows)', value: 'crlf' },
-];
+const lineEndingOptions = computed(() => [
+  { title: t('components.converter.lineEnding.lf'), value: 'lf' },
+  { title: t('components.converter.lineEnding.crlf'), value: 'crlf' },
+]);
 
-const quoteOptions = [
-  { title: 'Double Quote (")', value: '"' },
-  { title: "Single Quote (')", value: "'" },
-];
+const quoteOptions = computed(() => [
+  { title: t('common.csvOptions.doubleQuote'), value: '"' },
+  { title: t('common.csvOptions.singleQuote'), value: "'" },
+]);
 
 // Computed
 const hasSwimlaneErrors = computed(() => {
@@ -896,19 +892,19 @@ const canProceed = computed(() => {
 const nextButtonText = computed(() => {
   switch (currentStep.value) {
     case 1:
-      return 'Configure Mapping';
+      return t('common.steps.configureMapping');
     case 2:
-      return 'Preview & Export';
+      return t('common.steps.previewExport');
     default:
-      return 'Next';
+      return t('common.buttons.next');
   }
 });
 
 const statusMessage = computed(() => {
   if (currentStep.value === 1) {
-    if (converter.processing.value) return 'Parsing...';
+    if (converter.processing.value) return t('common.status.parsing');
     if (!converter.parsedCSV.value) return '';
-    return `${converter.parsedCSV.value.rows.length} rows, ${converter.parsedCSV.value.headers.length} columns`;
+    return t('views.converter.rowsColumns', { rows: converter.parsedCSV.value.rows.length, columns: converter.parsedCSV.value.headers.length });
   }
   return '';
 });
@@ -1044,7 +1040,7 @@ function onSaveConfig() {
   link.click();
   URL.revokeObjectURL(link.href);
 
-  successMessage.value = 'Configuration saved!';
+  successMessage.value = t('views.converter.configSaved');
   showSuccess.value = true;
 }
 
@@ -1058,7 +1054,7 @@ async function onConfigFileSelected(event: Event) {
   if (file) {
     const json = await file.text();
     converter.loadConfig(json);
-    successMessage.value = 'Configuration loaded!';
+    successMessage.value = t('views.converter.configLoaded');
     showSuccess.value = true;
   }
   // Reset input
@@ -1076,7 +1072,7 @@ async function onFullConfigFileSelected(event: Event) {
   if (file) {
     const json = await file.text();
     converter.loadConfig(json);
-    successMessage.value = 'Configuration loaded! CSV options and mappings applied.';
+    successMessage.value = t('views.converter.configLoadedWithOptions');
     showSuccess.value = true;
     // Re-parse CSV with new options if we have a file
     await reParseCSV();
@@ -1089,10 +1085,10 @@ async function onFullConfigFileSelected(event: Event) {
 function onDownloadCSV() {
   try {
     converter.downloadCSV(`${exportFilename.value}.csv`);
-    successMessage.value = 'CSV downloaded successfully!';
+    successMessage.value = t('views.converter.csvDownloaded');
     showSuccess.value = true;
   } catch (e) {
-    converter.error.value = e instanceof Error ? e.message : 'Failed to download CSV';
+    converter.error.value = e instanceof Error ? e.message : t('views.converter.failedToDownload');
   }
 }
 
@@ -1108,11 +1104,11 @@ async function onImportToFirefly() {
     showImportResultsDialog.value = true;
 
     if (importResults.value.failed === 0) {
-      successMessage.value = `Successfully imported ${importResults.value.successful} transactions!`;
+      successMessage.value = t('views.converter.successfullyImported', { count: importResults.value.successful });
       showSuccess.value = true;
     }
   } catch (e) {
-    converter.error.value = e instanceof Error ? e.message : 'Failed to import transactions';
+    converter.error.value = e instanceof Error ? e.message : t('views.converter.failedToImport');
     showImportDialog.value = false;
   }
 }

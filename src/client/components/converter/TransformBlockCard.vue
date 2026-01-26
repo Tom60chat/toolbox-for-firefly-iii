@@ -32,10 +32,10 @@
       <div class="nested-branch mt-2">
         <div class="branch-label text-success">
           <v-icon size="x-small" class="mr-1">mdi-check</v-icon>
-          Then
+          {{ t('components.converter.then') }}
         </div>
         <div class="nested-blocks-list">
-          <div v-if="block.thenBlocks.length === 0" class="empty-branch">(keep value)</div>
+          <div v-if="block.thenBlocks.length === 0" class="empty-branch">{{ t('components.converter.keepValue') }}</div>
           <TransformBlockCard
             v-for="nestedBlock in block.thenBlocks"
             :key="nestedBlock.id"
@@ -50,7 +50,7 @@
       <div v-if="block.elseBlocks.length > 0" class="nested-branch mt-2">
         <div class="branch-label text-warning">
           <v-icon size="x-small" class="mr-1">mdi-close</v-icon>
-          Else
+          {{ t('components.converter.else') }}
         </div>
         <div class="nested-blocks-list">
           <TransformBlockCard
@@ -70,10 +70,10 @@
       <div v-for="caseItem in block.cases" :key="caseItem.value" class="nested-branch mt-2">
         <div class="branch-label text-info">
           <v-icon size="x-small" class="mr-1">mdi-tag</v-icon>
-          Case "{{ caseItem.value }}"
+          {{ t('components.converter.case') }} "{{ caseItem.value }}"
         </div>
         <div class="nested-blocks-list">
-          <div v-if="caseItem.blocks.length === 0" class="empty-branch">(keep value)</div>
+          <div v-if="caseItem.blocks.length === 0" class="empty-branch">{{ t('components.converter.keepValue') }}</div>
           <TransformBlockCard
             v-for="nestedBlock in caseItem.blocks"
             :key="nestedBlock.id"
@@ -88,7 +88,7 @@
       <div v-if="block.defaultBlocks.length > 0" class="nested-branch mt-2">
         <div class="branch-label text-medium-emphasis">
           <v-icon size="x-small" class="mr-1">mdi-asterisk</v-icon>
-          Default
+          {{ t('settings.default') }}
         </div>
         <div class="nested-blocks-list">
           <TransformBlockCard
@@ -107,6 +107,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { TransformBlock, BlockTypeInfo } from '@shared/types/converter';
 import { BLOCK_TYPES } from '@shared/types/converter';
 
@@ -122,6 +123,8 @@ defineEmits<{
   delete: [];
 }>();
 
+const { t } = useI18n();
+
 const blockInfo = computed<BlockTypeInfo>(() => {
   return BLOCK_TYPES.find((b) => b.type === props.block.type) || BLOCK_TYPES[0];
 });
@@ -135,61 +138,61 @@ const previewLines = computed<DetailLine[]>(() => {
   const block = props.block;
   switch (block.type) {
     case 'column':
-      return [{ label: 'From', value: block.sourceColumn || '(not set)' }];
+      return [{ label: t('common.labels.from'), value: block.sourceColumn || t('components.converter.notSet') }];
     case 'static':
-      return [{ label: 'Value', value: block.value ? `"${block.value}"` : '(empty)' }];
+      return [{ label: t('common.labels.value'), value: block.value ? `"${block.value}"` : t('components.converter.empty') }];
     case 'truncate':
       return [
-        { label: 'Max length', value: `${block.maxLength} chars` },
-        { label: 'Ellipsis', value: block.ellipsis ? 'Yes' : 'No' },
+        { label: t('components.converter.maxLength'), value: t('components.converter.chars', { count: block.maxLength }) },
+        { label: t('components.converter.ellipsis'), value: block.ellipsis ? t('common.labels.yes') : t('common.labels.no') },
       ];
     case 'dateFormat':
       return [
-        { label: 'Input', value: block.inputFormat },
-        { label: 'Output', value: block.outputFormat },
+        { label: t('components.converter.input'), value: block.inputFormat },
+        { label: t('components.converter.output'), value: block.outputFormat },
       ];
     case 'numberFormat':
       return [
         {
-          label: 'Format',
+          label: t('components.converter.format'),
           value: `${block.inputDecimalSeparator} → ${block.outputDecimalSeparator}`,
         },
-        { label: 'Decimals', value: String(block.decimals) },
-        ...(block.absolute ? [{ label: 'Absolute', value: 'Yes' }] : []),
+        { label: t('components.converter.decimals'), value: String(block.decimals) },
+        ...(block.absolute ? [{ label: t('components.converter.absolute'), value: t('common.labels.yes') }] : []),
       ];
     case 'conditional': {
       const source = block.condition.useCurrentValue
-        ? 'Current value'
-        : block.condition.column || '(not set)';
+        ? t('components.converter.currentValue')
+        : block.condition.column || t('components.converter.notSet');
       return [
-        { label: 'If', value: `${source} ${block.condition.operator} "${block.condition.value}"` },
+        { label: t('components.converter.if'), value: `${source} ${block.condition.operator} "${block.condition.value}"` },
       ];
     }
     case 'switchCase': {
-      const source = block.useCurrentValue ? 'Current value' : block.column || '(not set)';
-      return [{ label: 'Switch on', value: source }];
+      const source = block.useCurrentValue ? t('components.converter.currentValue') : block.column || t('components.converter.notSet');
+      return [{ label: t('components.converter.switchOn'), value: source }];
     }
     case 'removeRow':
       return [
         {
-          label: 'If',
+          label: t('components.converter.if'),
           value: `${block.condition.column || '?'} ${block.condition.operator} "${block.condition.value}"`,
         },
       ];
     case 'prefix':
-      return [{ label: 'Prefix', value: block.prefix ? `"${block.prefix}"` : '(empty)' }];
+      return [{ label: t('components.converter.prefix'), value: block.prefix ? `"${block.prefix}"` : t('components.converter.empty') }];
     case 'suffix':
-      return [{ label: 'Suffix', value: block.suffix ? `"${block.suffix}"` : '(empty)' }];
+      return [{ label: t('components.converter.suffix'), value: block.suffix ? `"${block.suffix}"` : t('components.converter.empty') }];
     case 'replace':
       return [
-        { label: 'Find', value: block.find ? `"${block.find}"` : '(empty)' },
-        { label: 'Replace', value: `"${block.replace || ''}"` },
-        ...(block.useRegex ? [{ label: 'Regex', value: 'Yes' }] : []),
+        { label: t('components.converter.find'), value: block.find ? `"${block.find}"` : t('components.converter.empty') },
+        { label: t('components.converter.replace'), value: `"${block.replace || ''}"` },
+        ...(block.useRegex ? [{ label: t('components.converter.regex'), value: t('common.labels.yes') }] : []),
       ];
     case 'customScript':
-      return [{ label: 'Script', value: 'Custom JavaScript' }];
+      return [{ label: t('components.converter.script'), value: t('components.converter.customJavaScript') }];
     default:
-      return [{ label: 'Type', value: 'Unknown' }];
+      return [{ label: t('common.labels.type'), value: t('common.labels.unknown') }];
   }
 });
 </script>
