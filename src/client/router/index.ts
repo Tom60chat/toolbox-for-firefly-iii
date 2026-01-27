@@ -87,7 +87,7 @@ router.beforeEach(async (to, _from, next) => {
   const authStore = useAuthStore();
 
   // Update document title
-  document.title = `${to.meta.title || 'FireflyIII Toolbox'} - FireflyIII Toolbox`;
+  document.title = `${to.meta.title || 'Firefly-III Toolbox'} - Firefly-III Toolbox`;
 
   // Wait for auth to be initialized if not already
   if (!authStore.initialized) {

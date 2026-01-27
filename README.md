@@ -1,10 +1,10 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="public/logo.png">
   <source media="(prefers-color-scheme: light)" srcset="public/logo_light_mode.png">
-  <img alt="FireflyIII Toolbox" src="public/logo.png" width="80">
+  <img alt="Firefly-III Toolbox" src="public/logo.png" width="80">
 </picture>
 
-# FireflyIII Toolbox
+# Firefly-III Toolbox
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Docker](https://img.shields.io/badge/Docker-available-2496ED?logo=docker&logoColor=white)](https://github.com/xenolphthalein/firefly-toolbox/pkgs/container/firefly-toolbox)
@@ -24,7 +24,7 @@ Web automation suite for [FireflyIII](https://firefly-iii.org). Includes tools f
 
 ## Table of Contents
 
-- [FireflyIII Toolbox](#fireflyiii-toolbox)
+- [Firefly-III Toolbox](#fireflyiii-toolbox)
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
     - [Duplicate Finder](#duplicate-finder)

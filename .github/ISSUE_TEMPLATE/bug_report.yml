@@ -51,7 +51,7 @@ body:
     id: version
     attributes:
       label: Version
-      description: What version of FireflyIII Toolbox are you using?
+      description: What version of Firefly-III Toolbox are you using?
       placeholder: e.g., 1.0.0 or commit hash
     validations:
       required: false
@@ -60,7 +60,7 @@ body:
     id: deployment
     attributes:
       label: Deployment Method
-      description: How are you running FireflyIII Toolbox?
+      description: How are you running Firefly-III Toolbox?
       options:
         - Docker
         - Docker Compose
