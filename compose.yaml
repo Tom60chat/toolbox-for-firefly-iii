@@ -1,6 +1,6 @@
-# Docker Compose configuration for FireflyIII Toolbox
+# Docker Compose configuration for Firefly-III Toolbox
 # 
-# This file provides an example setup for running FireflyIII Toolbox.
+# This file provides an example setup for running Firefly-III Toolbox.
 #
 # SECURITY NOTES:
 #   - By default, the container binds to 127.0.0.1 (localhost only).

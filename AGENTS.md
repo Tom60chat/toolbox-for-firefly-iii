@@ -1,8 +1,8 @@
-# AGENTS.md — FireflyIII Toolbox Development Guide
+# AGENTS.md — Firefly-III Toolbox Development Guide
 
 ## Project Overview
 
-FireflyIII Toolbox is a web application that extends FireflyIII (personal finance manager) with automation tools. It provides features like duplicate detection, AI-powered category/tag suggestions, subscription pattern detection, and Amazon/PayPal transaction matching.
+Firefly-III Toolbox is a web application that extends FireflyIII (personal finance manager) with automation tools. It provides features like duplicate detection, AI-powered category/tag suggestions, subscription pattern detection, and Amazon/PayPal transaction matching.
 
 ---
 

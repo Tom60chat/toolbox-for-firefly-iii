@@ -87,7 +87,7 @@ app.use(errorHandler);
 
 // Start server
 const server = app.listen(config.port, () => {
-  loggers.server.info(`FireflyIII Toolbox server running on port ${config.port}`);
+  loggers.server.info(`Firefly-III Toolbox server running on port ${config.port}`);
   loggers.server.info(`Environment: ${config.nodeEnv}`);
 
   if (config.firefly.apiUrl) {
