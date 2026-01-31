@@ -35,6 +35,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,vue,json,css,scss}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,vue,json,css,scss}\"",
     "typecheck": "vue-tsc --noEmit && tsc --noEmit -p tsconfig.server.json",
     "test": "vitest run",
     "test:watch": "vitest",
