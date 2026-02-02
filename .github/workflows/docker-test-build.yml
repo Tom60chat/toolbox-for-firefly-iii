@@ -73,22 +73,49 @@ jobs:
       - name: Parse and format tags
         id: parse_tags
         run: |
+          set -euo pipefail
           # Convert comma-separated tags to Docker metadata format
           TAGS="${{ inputs.tags }}"
+
+          # Disallow newlines in the raw tags input
+          if printf '%s' "$TAGS" | grep -qE $'[\r\n]'; then
+            echo "Error: tags input must not contain newline characters." >&2
+            exit 1
+          fi
+
           FORMATTED_TAGS=""
           IFS=',' read -ra TAG_ARRAY <<< "$TAGS"
-          for tag in "${TAG_ARRAY[@]}"; do
+          for raw_tag in "${TAG_ARRAY[@]}"; do
             # Trim whitespace
-            tag=$(echo "$tag" | xargs)
-            if [ -n "$tag" ]; then
-              FORMATTED_TAGS="${FORMATTED_TAGS}type=raw,value=${tag}"$'\n'
+            tag=$(echo "$raw_tag" | xargs)
+            # Skip empty tags after trimming
+            if [ -z "$tag" ]; then
+              continue
             fi
+            # Enforce Docker tag format: lowercase alphanumerics, underscore, dot, dash; max length 128
+            if ! echo "$tag" | grep -Eq '^[a-z0-9][a-z0-9_.-]{0,127}$'; then
+              echo "Error: invalid Docker tag '$tag'. Tags must match '^[a-z0-9][a-z0-9_.-]{0,127}$'." >&2
+              exit 1
+            fi
+            FORMATTED_TAGS="${FORMATTED_TAGS}type=raw,value=${tag}"$'\n'
           done
-          # Remove trailing newline and set output
+
+          # Remove any empty lines
           FORMATTED_TAGS=$(echo "$FORMATTED_TAGS" | sed '/^$/d')
-          echo "tags<<EOF" >> $GITHUB_OUTPUT
-          echo "$FORMATTED_TAGS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Fail fast if no valid tags were parsed
+          if [ -z "$FORMATTED_TAGS" ]; then
+            echo "Error: No valid Docker tags parsed from input '${TAGS}'. Please provide at least one non-empty tag." >&2
+            exit 1
+          fi
+
+          # Use a unique delimiter to safely write multiline output
+          DELIM="EOF_$(date +%s%N)_$$"
+          {
+            echo "tags<<${DELIM}"
+            echo "$FORMATTED_TAGS"
+            echo "${DELIM}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Extract metadata for Docker
         id: meta
@@ -108,6 +135,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true
 
       - name: Output image info
         run: |
