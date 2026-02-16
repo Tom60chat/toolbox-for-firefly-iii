@@ -45,7 +45,7 @@
     "i18n:fix": "tsx scripts/check-i18n-keys.ts --fix"
   },
   "dependencies": {
-    "axios": "^1.13.3",
+    "axios": "^1.13.5",
     "axios-retry": "^4.5.0",
     "cors": "^2.8.6",
     "dayjs": "^1.11.19",
