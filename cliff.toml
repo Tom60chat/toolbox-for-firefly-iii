@@ -7,8 +7,13 @@ body = """
 {% for group, commits in commits | group_by(attribute="group") %}
 ### {{ group | upper_first }}
 {% for commit in commits %}
-- {% if commit.scope %}**{{ commit.scope }}:** {% endif %}{{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/commit/{{ commit.id }}))\
+- {% if commit.scope %}**{{ commit.scope }}:** {% endif %}{{ commit.message | upper_first }} (by {{ commit.author.name | default(value="unknown contributor") }}) ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/commit/{{ commit.id }}))\
 {% endfor %}
+{% endfor %}
+
+### Contributors
+{% for contributor, commits in commits | group_by(attribute="author.name") %}
+- {{ contributor | default(value="unknown contributor") }} ({{ commits | length }} commit{% if commits | length != 1 %}s{% endif %})
 {% endfor %}
 """
 # Remove leading and trailing whitespace
