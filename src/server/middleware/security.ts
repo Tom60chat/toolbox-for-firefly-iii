@@ -71,23 +71,19 @@ export function configureSecurityMiddleware(app: Application): void {
   // Remove upgrade-insecure-requests when not using HTTPS to prevent browser upgrade attempts
   if (!useHttps) {
     delete cspDirectives['upgrade-insecure-requests'];
-  } else { // In case defaults change in the future, ensure it's set when using HTTPS
+  } else {
+    // In case defaults change in the future, ensure it's set when using HTTPS
     // Only upgrade insecure requests when using HTTPS
     // This prevents browsers from trying HTTPS when serving over HTTP
     cspDirectives['upgrade-insecure-requests'] = [];
   }
 
   // Override defaults with our custom requirements (note: CSP uses kebab-case keys)
-  cspDirectives['default-src'] = ["'self'"];
-  // Allow WASM and eval (some Vuetify/Vue dependencies require eval)
   cspDirectives['script-src'] = ["'self'", "'unsafe-eval'", "'wasm-unsafe-eval'"];
-  cspDirectives['style-src'] = ["'self'", "'unsafe-inline'"]; // Vuetify uses inline styles
+  cspDirectives['style-src'] = ["'self'", "'unsafe-inline'"];
   cspDirectives['img-src'] = ["'self'", 'data:', 'blob:'];
   cspDirectives['font-src'] = ["'self'", 'data:'];
   cspDirectives['connect-src'] = ["'self'"];
-  cspDirectives['frame-ancestors'] = ["'self'"]; // Prevent clickjacking
-  cspDirectives['form-action'] = ["'self'"];
-  cspDirectives['base-uri'] = ["'self'"];
 
   app.use(
     helmet({
